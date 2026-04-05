@@ -1,1 +1,671 @@
-# https-66kk66kk.github.io-portfolio
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KIM SUNG HO | 3D & Motion Technical Artist</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&family=Pretendard:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Pretendard', 'sans-serif'],
+                        urbanist: ['Urbanist', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            neon: '#deff9a',
+                            dark: '#050505',
+                            card: '#0a0a0a',
+                            border: '#1a1a1a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 커서 설정을 default로 변경하여 마우스 포인터가 보이게 함 */
+        body { background-color: #050505; color: #f5f5f5; cursor: default; overflow-x: hidden; }
+        ::-webkit-scrollbar { display: none; }
+
+        /* Custom Cursor (디자인 요소로 유지하되 시스템 커서와 병행) */
+        #cursor-dot {
+            position: fixed; top: 0; left: 0; width: 8px; height: 8px;
+            background-color: #deff9a; border-radius: 50%;
+            transform: translate(-50%, -50%); z-index: 9999; pointer-events: none;
+        }
+        #cursor-outline {
+            position: fixed; top: 0; left: 0; width: 40px; height: 40px;
+            border: 1px solid rgba(222, 255, 154, 0.4); border-radius: 50%;
+            transform: translate(-50%, -50%); z-index: 9998; pointer-events: none;
+            transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1), height 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* Hero Grid Background */
+        .grid-bg {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(222, 255, 154, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(222, 255, 154, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black, transparent 80%);
+            z-index: -1;
+        }
+
+        .noise-overlay {
+            position: fixed; inset: 0;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.03; pointer-events: none; z-index: 50;
+        }
+
+        /* Text Reveal */
+        .reveal-mask { overflow: hidden; display: block; }
+        .reveal-text { display: block; transform: translateY(110%); }
+
+        /* Project Cards */
+        .video-card { transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .video-wrapper { 
+            position: relative; overflow: hidden; border-radius: 20px; 
+            border: 1px solid #1a1a1a; background: #0a0a0a;
+            aspect-ratio: 16/9;
+            cursor: pointer;
+        }
+        .video-wrapper:hover { border-color: #deff9a; }
+        
+        .play-btn {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            width: 80px; height: 80px; background: rgba(222, 255, 154, 0.9);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #000; font-size: 24px; opacity: 0; transition: all 0.4s ease;
+        }
+        .video-wrapper:hover .play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+        .tag {
+            padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Magnetic Button Effect Area */
+        .magnetic-wrap { display: inline-block; transition: transform 0.3s ease-out; }
+
+        /* Text Gradient */
+        .text-gradient {
+            background: linear-gradient(135deg, #deff9a 0%, #a7f3d0 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .scroll-progress {
+            position: fixed; top: 0; left: 0; width: 0%; height: 3px;
+            background: #deff9a; z-index: 100;
+        }
+
+        .mask-vertical {
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+
+        /* 링크 및 버튼에 커서 포인터 적용 */
+        a, button, .hover-trigger { cursor: pointer; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="scroll-progress" id="progress-bar"></div>
+    <div id="cursor-dot"></div>
+    <div id="cursor-outline"></div>
+    <div class="noise-overlay"></div>
+
+    <!-- 1. Navigation -->
+    <nav class="fixed top-0 w-full z-40 px-6 py-8 flex justify-between items-center mix-blend-difference">
+        <div class="font-urbanist font-black text-2xl tracking-tighter hover-trigger cursor-pointer">KSH<span class="text-brand-neon">.</span></div>
+        <div class="flex gap-8 text-sm font-bold uppercase tracking-widest">
+            <a href="#works" class="hover-trigger transition-opacity hover:opacity-60">Works</a>
+            <a href="#about" class="hover-trigger transition-opacity hover:opacity-60">Process</a>
+            <a href="#contact" class="hover-trigger transition-opacity hover:opacity-60">Contact</a>
+        </div>
+    </nav>
+
+    <!-- 2. Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+        <div class="grid-bg"></div>
+        <div id="hero-glow" class="absolute w-[800px] h-[800px] bg-brand-neon/5 blur-[150px] rounded-full pointer-events-none transition-transform duration-1000 ease-out"></div>
+        
+        <div class="w-full max-w-7xl mx-auto flex flex-col items-center text-center">
+            <div class="reveal-mask mb-8">
+                <span class="reveal-text text-brand-neon text-xs font-black tracking-[0.3em] uppercase bg-brand-neon/10 py-2 px-6 rounded-full border border-brand-neon/20">
+                    Precision in Motion & Space
+                </span>
+            </div>
+            
+            <h1 class="text-[clamp(3rem,15vw,180px)] leading-[0.85] font-black tracking-tighter uppercase font-urbanist mb-12">
+                <div class="reveal-mask"><span class="reveal-text">KIM SUNG</span></div>
+                <div class="reveal-mask"><span class="reveal-text text-brand-neon">HO<span class="text-white">.</span></span></div>
+            </h1>
+            
+            <div class="max-w-xl gs-fade">
+                <p class="text-stone-400 text-lg md:text-xl font-medium leading-relaxed">
+                    데이터를 시각화하고, 시스템을 예술로 승화시키는<br>
+                    <span class="text-white">3D 모션 & 버추얼 테크니컬 아티스트입니다.</span>
+                </p>
+            </div>
+
+            <div class="mt-20 gs-fade">
+                <div class="animate-bounce text-stone-600">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Philosophy Section -->
+    <section class="py-40 px-6 relative overflow-hidden bg-brand-card" id="about">
+        <div class="max-w-5xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-20 items-center">
+                <div class="gs-fade">
+                    <h2 class="text-4xl md:text-5xl font-black leading-tight mb-10">
+                        상상을 현실로 만드는<br><span class="text-gradient">테크니컬 워크플로우</span>
+                    </h2>
+                    
+                    <div class="flex flex-col gap-8 mb-10">
+                        <!-- Skill 1 -->
+                        <div class="flex gap-5 items-start group">
+                            <div class="w-12 h-12 rounded-full border border-brand-border bg-black flex items-center justify-center shrink-0 group-hover:border-brand-neon transition-colors">
+                                <i class="fa-solid fa-film text-brand-neon"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-bold text-lg mb-2 group-hover:text-brand-neon transition-colors">Creative Motion & Edit</h3>
+                                <p class="text-stone-400 text-sm leading-relaxed">
+                                    단순히 3D 모델링을 넘어, 영상의 호흡과 리듬을 설계합니다. 감각적인 트랜지션과 키네틱 타이포그래피를 활용해 시청자의 몰입도를 높이는 모션 그래픽을 제작합니다.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Skill 2 -->
+                        <div class="flex gap-5 items-start group">
+                            <div class="w-12 h-12 rounded-full border border-brand-border bg-black flex items-center justify-center shrink-0 group-hover:border-brand-neon transition-colors">
+                                <i class="fa-solid fa-vr-cardboard text-brand-neon"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-bold text-lg mb-2 group-hover:text-brand-neon transition-colors">Virtual Avatar Setup</h3>
+                                <p class="text-stone-400 text-sm leading-relaxed">
+                                    실시간 방송에 바로 투입할 수 있는 버추얼 아바타를 세팅합니다. 자연스러운 표정을 위한 세밀한 쉐이프키 작업과 움직임에 생동감을 더하는 다이내믹본 세팅에 집중합니다.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Skill 3 -->
+                        <div class="flex gap-5 items-start group">
+                            <div class="w-12 h-12 rounded-full border border-brand-border bg-black flex items-center justify-center shrink-0 group-hover:border-brand-neon transition-colors">
+                                <i class="fa-solid fa-fire-flame-curved text-brand-neon"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-bold text-lg mb-2 group-hover:text-brand-neon transition-colors">Physics Simulation</h3>
+                                <p class="text-stone-400 text-sm leading-relaxed">
+                                    블렌더의 물리 엔진을 활용해 역동적인 씬을 연출합니다. 파티클, 유체, 소프트바디 등 다양한 시뮬레이션을 지속적으로 테스트하고 연구하며 표현의 한계를 넓혀가고 있습니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <span class="tag">#3DMotion</span>
+                        <span class="tag">#VirtualHuman</span>
+                        <span class="tag">#Simulation</span>
+                    </div>
+                </div>
+                <div class="relative gs-fade h-[500px] w-full">
+                    <!-- R&D Archive Animated Wall -->
+                    <div class="absolute inset-0 rounded-3xl border border-brand-border bg-black/40 overflow-hidden flex gap-4 p-4 mask-vertical shadow-2xl shadow-brand-neon/5">
+                        
+                        <!-- Column 1 (Auto-scroll UP & Draggable) -->
+                        <div class="archive-column flex-1 overflow-hidden cursor-grab select-none" data-direction="1">
+                            <div class="archive-wrapper w-full">
+                                <div class="archive-inner flex flex-col gap-4 pb-4">
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-24 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                            <div class="absolute inset-0 bg-brand-neon/10 mix-blend-overlay"></div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-24 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Column 2 (Auto-scroll DOWN & Draggable) -->
+                        <div class="archive-column flex-1 overflow-hidden cursor-grab select-none" data-direction="-1">
+                            <div class="archive-wrapper w-full">
+                                <div class="archive-inner flex flex-col gap-4 pb-4">
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-24 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="https://images.unsplash.com/photo-1633519842468-b7eb1a4b92c4?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-28 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                            <div class="absolute inset-0 bg-brand-neon/10 mix-blend-overlay"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 중앙 오버레이 텍스트 -->
+                        <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-10 mix-blend-difference">
+                            <h3 class="text-4xl font-black text-white tracking-widest text-center leading-tight opacity-20 font-urbanist">
+                                CONTINUOUS<br>R&D
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Featured Works -->
+    <section class="py-40 px-6 relative" id="works">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+                <div class="gs-fade">
+                    <span class="text-brand-neon font-black tracking-widest text-xs uppercase block mb-4">Portfolio Highlights</span>
+                    <h2 class="text-6xl md:text-8xl font-black tracking-tighter uppercase font-urbanist leading-none">Works<span class="text-brand-neon">.</span></h2>
+                </div>
+                <p class="text-stone-500 max-w-xs text-sm gs-fade">기획부터 모델링, 시뮬레이션, 포스트 프로덕션까지 모든 공정을 완수한 프로젝트들입니다.</p>
+            </div>
+
+            <!-- Project 01 -->
+            <div class="group mb-40 gs-fade">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-7 order-2 lg:order-1">
+                        <div class="video-wrapper hover-trigger shadow-2xl shadow-brand-neon/5" onclick="playVideo(this, 'P8ZCVqonuC0')">
+                            <!-- 유튜브 공식 썸네일 URL 연결 -->
+                            <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/P8ZCVqonuC0/maxresdefault.jpg');"></div>
+                            <div class="play-btn"><i class="fa-solid fa-play ml-1"></i></div>
+                            <div class="absolute bottom-6 left-6 flex gap-2">
+                                <span class="tag bg-black/50 backdrop-blur-md border-brand-neon/30 text-brand-neon">AI 기획</span>
+                                <span class="tag bg-black/50 backdrop-blur-md">Motion Graphics</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-5 order-1 lg:order-2">
+                        <span class="text-brand-neon font-black text-sm mb-4 block">01 / AI PLANNED PORTFOLIO</span>
+                        <h3 class="text-4xl font-bold mb-6 group-hover:text-brand-neon transition-colors">AI 기획 기반 영상 포트폴리오</h3>
+                        <p class="text-stone-400 text-lg leading-relaxed mb-8">
+                            제미나이 AI를 활용하여 기획된 모션 그래픽 포트폴리오입니다. 그래픽 매치, 키네틱 타이포, 스매시 컷 등 다양한 편집 기술을 적용하여 몰입감 높은 연출을 완성했습니다.
+                        </p>
+                        <div class="p-6 rounded-2xl border border-brand-border bg-brand-card/50">
+                            <h4 class="text-xs font-black uppercase tracking-widest text-stone-500 mb-4">Core Skills</h4>
+                            <div class="flex gap-6">
+                                <div class="text-center">
+                                    <i class="fa-solid fa-cubes text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">Blender</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa-solid fa-scissors text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">Premiere</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">FX</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 02 -->
+            <div class="group mb-40 gs-fade">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-5">
+                        <span class="text-teal-400 font-black text-sm mb-4 block">02 / VIRTUAL SYSTEM</span>
+                        <h3 class="text-4xl font-bold mb-6 group-hover:text-teal-400 transition-colors">실시간 버추얼 아바타 파이프라인</h3>
+                        <p class="text-stone-400 text-lg leading-relaxed mb-8">
+                            라이브 스트리밍 및 리얼타임 렌더링에 최적화된 버추얼 캐릭터 세팅입니다. 페이셜 트래킹을 위한 세밀한 블렌드쉐이프 작업과 다이내믹본(물리 연산) 최적화를 통해 자연스러운 움직임을 구현했습니다.
+                        </p>
+                        <div class="p-6 rounded-2xl border border-brand-border bg-brand-card/50">
+                            <h4 class="text-xs font-black uppercase tracking-widest text-stone-500 mb-4">Core Skills</h4>
+                            <div class="flex gap-6">
+                                <div class="text-center">
+                                    <i class="fa-solid fa-user-astronaut text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">Rigging</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa-brands fa-unity text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">Unity</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa-solid fa-mobile-screen text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">Tracking</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-7">
+                        <div class="video-wrapper hover-trigger shadow-2xl shadow-teal-400/5" onclick="playVideo(this, 'EsTZYuJ5cZ8')">
+                            <!-- 유튜브 공식 썸네일 URL 연결 -->
+                            <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/EsTZYuJ5cZ8/maxresdefault.jpg');"></div>
+                            <div class="play-btn !bg-teal-400"><i class="fa-solid fa-play ml-1"></i></div>
+                            <div class="absolute bottom-6 left-6 flex gap-2">
+                                <span class="tag bg-black/50 backdrop-blur-md border-teal-400/30 text-teal-400">Virtual Human</span>
+                                <span class="tag bg-black/50 backdrop-blur-md">Unity 3D</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. R&D Lab (Simulations) -->
+    <section class="py-40 px-6 bg-[#080808]" id="rnd">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20 text-center gs-fade">
+                <h2 class="text-4xl md:text-5xl font-black mb-4">Physics R&D Lab</h2>
+                <p class="text-stone-500 uppercase tracking-[0.2em] text-xs font-bold">블렌더 물리 엔진 및 시뮬레이션 연구</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'Bie57Opktyk')">
+                    <div class="video-wrapper !aspect-square mb-4">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/Bie57Opktyk/maxresdefault.jpg');"></div>
+                        <div class="play-btn !w-14 !h-14 !text-base">Play</div>
+                    </div>
+                    <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">눈 불꽃 (Snow Spark)</h4>
+                    <p class="text-[11px] text-stone-500 uppercase font-black">파티클 및 화염방사기 연산</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'XN8qbA3e2YI')" style="transition-delay: 0.1s">
+                    <div class="video-wrapper !aspect-square mb-4">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/XN8qbA3e2YI/maxresdefault.jpg');"></div>
+                        <div class="play-btn !w-14 !h-14 !text-base">Play</div>
+                    </div>
+                    <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">초콜릿 (Chocolate)</h4>
+                    <p class="text-[11px] text-stone-500 uppercase font-black">모디파이어 및 파티클 활용</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'w8osKpDN8vU')" style="transition-delay: 0.2s">
+                    <div class="video-wrapper !aspect-square mb-4">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/w8osKpDN8vU/maxresdefault.jpg');"></div>
+                        <div class="play-btn !w-14 !h-14 !text-base">Play</div>
+                    </div>
+                    <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">테트리스 (Tetris)</h4>
+                    <p class="text-[11px] text-stone-500 uppercase font-black">피직스 소프트 바디 애니메이션</p>
+                </div>
+                <!-- Card 4 -->
+                <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'hl0i3sP4390')" style="transition-delay: 0.3s">
+                    <div class="video-wrapper !aspect-square mb-4">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/hl0i3sP4390/maxresdefault.jpg');"></div>
+                        <div class="play-btn !w-14 !h-14 !text-base">Play</div>
+                    </div>
+                    <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">액체 시뮬레이션</h4>
+                    <p class="text-[11px] text-stone-500 uppercase font-black">유체 역학 및 렌더링</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Footer & Contact -->
+    <footer class="py-40 px-6 relative overflow-hidden" id="contact">
+        <div class="max-w-7xl mx-auto text-center">
+            <span class="text-brand-neon font-black tracking-widest text-xs uppercase block mb-8 gs-fade">Let's create the future</span>
+            <h2 class="text-5xl md:text-[120px] font-black font-urbanist uppercase tracking-tighter leading-none mb-20 gs-fade">
+                Work with <span class="text-brand-neon">Me</span>
+            </h2>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center gap-10 gs-fade">
+                <a href="mailto:66kk66kk@naver.com" class="magnetic-wrap hover-trigger group">
+                    <div class="px-12 py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center gap-4">
+                        <span class="font-black text-xl">66kk66kk@naver.com</span>
+                        <i class="fa-solid fa-arrow-right-long text-brand-neon group-hover:text-black"></i>
+                    </div>
+                </a>
+                <div class="flex gap-6">
+                    <a href="tel:010-2240-4984" class="w-16 h-16 rounded-full border border-brand-border flex items-center justify-center text-xl hover:bg-white hover:text-black transition-colors hover-trigger">
+                        <i class="fa-solid fa-phone"></i>
+                    </a>
+                    <a href="#" class="w-16 h-16 rounded-full border border-brand-border flex items-center justify-center text-xl hover:bg-white hover:text-black transition-colors hover-trigger">
+                        <i class="fa-brands fa-artstation"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="mt-40 pt-12 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-6 text-stone-600 text-xs font-bold uppercase tracking-widest">
+                <p>© 2025 KIM SUNG HO. All Rights Reserved.</p>
+                <p>Designed with Analytical Passion</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // 1. Lenis Smooth Scroll
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smooth: true,
+        });
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // 2. GSAP & Scroll Management
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Scroll Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
+        });
+
+        // 3. Custom Cursor
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+        
+        window.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            
+            gsap.to(cursorDot, { x: clientX, y: clientY, duration: 0 });
+            gsap.to(cursorOutline, { x: clientX, y: clientY, duration: 0.5, ease: 'power3.out' });
+        });
+
+        const hoverElements = document.querySelectorAll('.hover-trigger, a, button');
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorOutline.style.width = '60px';
+                cursorOutline.style.height = '60px';
+                cursorOutline.style.borderColor = '#deff9a';
+                cursorOutline.style.backgroundColor = 'rgba(222, 255, 154, 0.1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorOutline.style.width = '40px';
+                cursorOutline.style.height = '40px';
+                cursorOutline.style.borderColor = 'rgba(222, 255, 154, 0.4)';
+                cursorOutline.style.backgroundColor = 'transparent';
+            });
+        });
+
+        // 4. Hero Reveal
+        gsap.to('.reveal-text', {
+            y: '0%', duration: 1.5, ease: 'expo.out', stagger: 0.1, delay: 0.5
+        });
+
+        // Background Glow Follow
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 60;
+            const y = (e.clientY / window.innerHeight - 0.5) * 60;
+            gsap.to('#hero-glow', { x, y, duration: 1.5, ease: 'power2.out' });
+        });
+
+        // 5. Scroll Fade Up
+        gsap.utils.toArray('.gs-fade').forEach(el => {
+            gsap.fromTo(el, 
+                { opacity: 0, y: 30 },
+                { 
+                    scrollTrigger: {
+                        trigger: el,
+                        start: "top 90%",
+                        toggleActions: "play none none reverse"
+                    },
+                    opacity: 1, y: 0, duration: 1, ease: 'power3.out'
+                }
+            );
+        });
+
+        // 6. Magnetic Effect
+        const magneticWraps = document.querySelectorAll('.magnetic-wrap');
+        magneticWraps.forEach(wrap => {
+            wrap.addEventListener('mousemove', (e) => {
+                const rect = wrap.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                gsap.to(wrap, { x: x * 0.3, y: y * 0.3, duration: 0.5, ease: 'power2.out' });
+            });
+            wrap.addEventListener('mouseleave', () => {
+                gsap.to(wrap, { x: 0, y: 0, duration: 1, ease: 'elastic.out(1, 0.3)' });
+            });
+        });
+
+        // 7. Video Player
+        function playVideo(container, source) {
+            const wrapper = container.classList.contains('video-wrapper') ? container : container.querySelector('.video-wrapper');
+            
+            // 영상 재생 시 커서가 사라지게 했던 로직을 제거하여 마우스가 보이도록 유지
+            // cursorDot.style.opacity = '0'; (기존 로직 주석 처리)
+            // cursorOutline.style.opacity = '0'; (기존 로직 주석 처리)
+            
+            // source 파일이 .mp4인지 유튜브 ID인지 확인하여 렌더링 분기
+            if (source.endsWith('.mp4')) {
+                wrapper.innerHTML = `
+                    <video class="absolute inset-0 w-full h-full object-cover" controls autoplay>
+                        <source src="${source}" type="video/mp4">
+                        브라우저가 동영상을 지원하지 않습니다.
+                    </video>
+                `;
+            } else {
+                wrapper.innerHTML = `
+                    <iframe 
+                        src="https://www.youtube-nocookie.com/embed/${source}?autoplay=1&mute=0&rel=0&modestbranding=1" 
+                        class="absolute inset-0 w-full h-full border-0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                `;
+            }
+            wrapper.onclick = null;
+            wrapper.style.cursor = 'default';
+        }
+
+        // 8. Auto-scroll & Draggable Archive
+        const archiveCols = document.querySelectorAll('.archive-column');
+        archiveCols.forEach(col => {
+            const wrapper = col.querySelector('.archive-wrapper');
+            const inner = col.querySelector('.archive-inner');
+            
+            // 3배수로 복제 (위, 중간, 아래 무한루프용 빈공간 방지)
+            wrapper.appendChild(inner.cloneNode(true));
+            wrapper.appendChild(inner.cloneNode(true));
+
+            let isDown = false;
+            let startY;
+            let targetY = 0;
+            const direction = parseInt(col.getAttribute('data-direction') || '1'); 
+            const speed = 0.5 * direction;
+            let itemHeight = 0;
+
+            // 마우스 드래그 이벤트
+            col.addEventListener('mousedown', (e) => {
+                isDown = true;
+                col.style.cursor = 'grabbing';
+                startY = e.pageY - targetY;
+            });
+            col.addEventListener('mouseleave', () => { isDown = false; col.style.cursor = 'grab'; });
+            col.addEventListener('mouseup', () => { isDown = false; col.style.cursor = 'grab'; });
+            col.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                targetY = e.pageY - startY;
+            });
+
+            // 모바일 터치(스와이프) 이벤트
+            col.addEventListener('touchstart', (e) => {
+                isDown = true;
+                startY = e.touches[0].pageY - targetY;
+            });
+            col.addEventListener('touchend', () => { isDown = false; });
+            col.addEventListener('touchmove', (e) => {
+                if (!isDown) return;
+                e.preventDefault(); // 스와이프 시 화면 전체가 당겨지는 현상 방지
+                targetY = e.touches[0].pageY - startY;
+            }, { passive: false });
+
+            // 자동 스크롤 루프
+            function playScroll() {
+                // 아이템 전체 높이 측정
+                itemHeight = inner.offsetHeight;
+
+                if (!isDown) { // 사용자가 드래그 중이 아닐 때만 자체 속도로 이동
+                    targetY -= speed; 
+                }
+                
+                // 수학적 무한 루프 로직 (가운데 요소를 기준으로 끝에 다다르면 즉시 위치 리셋)
+                if (itemHeight > 0) {
+                    while (targetY <= -itemHeight * 2) {
+                        targetY += itemHeight;
+                        if (isDown) startY -= itemHeight; // 드래그 중 위치가 리셋되어도 마우스 위치가 튀지 않게 보정
+                    } 
+                    while (targetY > 0) {
+                        targetY -= itemHeight;
+                        if (isDown) startY += itemHeight;
+                    }
+                }
+                
+                // CSS transform을 이용해 브라우저 렌더링 한계 극복 (가장 부드러운 방식)
+                wrapper.style.transform = `translateY(${targetY}px)`;
+                
+                requestAnimationFrame(playScroll);
+            }
+            
+            // 초기 시작 위치를 정중앙으로 세팅
+            setTimeout(() => {
+                itemHeight = inner.offsetHeight;
+                targetY = -itemHeight;
+                playScroll();
+            }, 100); 
+        });
+    </script>
+</body>
+</html>
