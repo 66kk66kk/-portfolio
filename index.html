@@ -236,18 +236,21 @@
                                 <div class="archive-inner flex flex-col gap-4 pb-4">
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-24 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                            <!-- 👇 기존 unsplash 주소를 지우고 내 파일명으로 교체 예시 -->
+                                            <img src="./vseeface.jpg" class="w-full h-full object-cover opacity-60" alt="프로젝트">
                                             <div class="absolute inset-0 bg-brand-neon/10 mix-blend-overlay"></div>
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                            <!-- 👇 두 번째 이미지 교체 예시 -->
+                                            <img src="./next-log.jpg" class="w-full h-full object-cover opacity-60" alt="프로젝트">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-24 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                            <!-- 👇 세 번째 이미지 교체 예시 -->
+                                            <img src="./run-motion.jpg" class="w-full h-full object-cover opacity-60" alt="프로젝트">
                                         </div>
                                     </div>
                                 </div>
@@ -260,17 +263,20 @@
                                 <div class="archive-inner flex flex-col gap-4 pb-4">
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="https://images.unsplash.com/photo-1574169208507-84376144848b?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                            <!-- 👇 네 번째 이미지 교체 예시 -->
+                                            <img src="./trickal-diana.jpg" class="w-full h-full object-cover opacity-60" alt="프로젝트">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-24 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="https://images.unsplash.com/photo-1633519842468-b7eb1a4b92c4?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                            <!-- 👇 다섯 번째 이미지 교체 예시 -->
+                                            <img src="./car-study.jpg" class="w-full h-full object-cover opacity-60" alt="프로젝트">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-28 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover opacity-60" alt="프로젝트">
+                                            <!-- 👇 여섯 번째 이미지 교체 예시 -->
+                                            <img src="./flower-bg.jpg" class="w-full h-full object-cover opacity-60" alt="프로젝트">
                                             <div class="absolute inset-0 bg-brand-neon/10 mix-blend-overlay"></div>
                                         </div>
                                     </div>
@@ -442,25 +448,26 @@
                 Work with <span class="text-brand-neon">Me</span>
             </h2>
             
-            <div class="flex flex-col md:flex-row items-center justify-center gap-10 gs-fade">
-                <a href="mailto:66kk66kk@naver.com" class="magnetic-wrap hover-trigger group">
-                    <div class="px-12 py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center gap-4">
-                        <span class="font-black text-xl">66kk66kk@naver.com</span>
-                        <i class="fa-solid fa-arrow-right-long text-brand-neon group-hover:text-black"></i>
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 gs-fade w-full">
+                <!-- Email Button -->
+                <a href="mailto:66kk66kk@naver.com" class="magnetic-wrap hover-trigger group" onclick="sendDiscordAlert('이메일')">
+                    <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
+                        <i class="fa-solid fa-envelope text-brand-neon group-hover:text-black text-xl"></i>
+                        <span class="font-black text-lg md:text-xl tracking-wide">66kk66kk@naver.com</span>
                     </div>
                 </a>
-                <div class="flex gap-6">
-                    <a href="tel:010-2240-4984" class="w-16 h-16 rounded-full border border-brand-border flex items-center justify-center text-xl hover:bg-white hover:text-black transition-colors hover-trigger">
-                        <i class="fa-solid fa-phone"></i>
-                    </a>
-                    <a href="#" class="w-16 h-16 rounded-full border border-brand-border flex items-center justify-center text-xl hover:bg-white hover:text-black transition-colors hover-trigger">
-                        <i class="fa-brands fa-artstation"></i>
-                    </a>
-                </div>
+                
+                <!-- Phone Button -->
+                <a href="tel:010-2240-4984" class="magnetic-wrap hover-trigger group" onclick="sendDiscordAlert('전화번호')">
+                    <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
+                        <i class="fa-solid fa-phone text-brand-neon group-hover:text-black text-xl"></i>
+                        <span class="font-black text-lg md:text-xl tracking-wide">010-2240-4984</span>
+                    </div>
+                </a>
             </div>
             
             <div class="mt-40 pt-12 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-6 text-stone-600 text-xs font-bold uppercase tracking-widest">
-                <p>© 2025 KIM SUNG HO. All Rights Reserved.</p>
+                <p>© 2026 KIM SUNG HO. All Rights Reserved.</p>
                 <p>Designed with Analytical Passion</p>
             </div>
         </div>
@@ -666,6 +673,28 @@
                 playScroll();
             }, 100); 
         });
+
+        // 9. Discord 알림 봇 연동
+        function sendDiscordAlert(contactType) {
+            // 👇 전달해주신 디스코드 웹훅 URL 적용 완료!
+            const webhookUrl = "https://discord.com/api/webhooks/1490564264258441237/83rv0jgCo6pzRIQHLkvGqi12agU1lbo1CpHFd8x3H2YArHhKQg98mQlp1-SayHY5Nqvo"; 
+            
+            if (webhookUrl === "여기에_디스코드_웹훅_URL을_붙여넣으세요" || !webhookUrl) {
+                return; // 웹훅 URL을 안 넣으면 작동하지 않음
+            }
+
+            const payload = {
+                content: `🚨 **포트폴리오 새 소식!**\n방금 누군가 포트폴리오에서 **[ ${contactType} ]** 버튼을 클릭했습니다! (시간: ${new Date().toLocaleString('ko-KR')})`
+            };
+
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            }).catch(error => console.error("Discord alert failed:", error));
+        }
     </script>
 </body>
 </html>
