@@ -450,18 +450,18 @@
             
             <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 gs-fade w-full">
                 <!-- Email Button -->
-                <a href="mailto:66kk66kk@naver.com" class="magnetic-wrap hover-trigger group" onclick="sendDiscordAlert('이메일')">
+                <a class="magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '이메일', '66kk66kk@naver.com')">
                     <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
                         <i class="fa-solid fa-envelope text-brand-neon group-hover:text-black text-xl"></i>
-                        <span class="font-black text-lg md:text-xl tracking-wide">66kk66kk@naver.com</span>
+                        <span class="font-black text-lg md:text-xl tracking-wide contact-text transition-colors">66kk66kk@naver.com</span>
                     </div>
                 </a>
                 
                 <!-- Phone Button -->
-                <a href="tel:010-2240-4984" class="magnetic-wrap hover-trigger group" onclick="sendDiscordAlert('전화번호')">
+                <a class="magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '전화번호', '010-2240-4984')">
                     <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
                         <i class="fa-solid fa-phone text-brand-neon group-hover:text-black text-xl"></i>
-                        <span class="font-black text-lg md:text-xl tracking-wide">010-2240-4984</span>
+                        <span class="font-black text-lg md:text-xl tracking-wide contact-text transition-colors">010-2240-4984</span>
                     </div>
                 </a>
             </div>
@@ -674,7 +674,34 @@
             }, 100); 
         });
 
-        // 9. Discord 알림 봇 연동
+        // 9. Contact Click Handler (클립보드 복사 + 디스코드 알림)
+        function handleContactClick(e, contactType, value) {
+            e.preventDefault(); // 기본 링크 이동 방지 (빈 창 뜨는 현상 해결)
+
+            // 1. 클립보드에 텍스트 복사 (호환성을 위해 execCommand 사용)
+            const tempInput = document.createElement("input");
+            tempInput.value = value;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            // 2. 버튼 텍스트를 '복사 완료!'로 임시 변경하여 시각적 피드백 제공
+            const textSpan = e.currentTarget.querySelector('.contact-text');
+            const originalText = value;
+            
+            textSpan.innerText = "복사 완료! (Copied)";
+            
+            // 2초 뒤에 원래 텍스트로 복구
+            setTimeout(() => {
+                textSpan.innerText = originalText;
+            }, 2000);
+
+            // 3. 디스코드 알림 전송 실행
+            sendDiscordAlert(contactType);
+        }
+
+        // 10. Discord 알림 봇 연동
         function sendDiscordAlert(contactType) {
             // 👇 전달해주신 디스코드 웹훅 URL 적용 완료!
             const webhookUrl = "https://discord.com/api/webhooks/1490564264258441237/83rv0jgCo6pzRIQHLkvGqi12agU1lbo1CpHFd8x3H2YArHhKQg98mQlp1-SayHY5Nqvo"; 
