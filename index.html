@@ -118,7 +118,7 @@
         }
 
         /* 링크 및 버튼에 커서 포인터 적용 */
-        a, button, .hover-trigger { cursor: pointer; }
+        a, button, .hover-trigger, .cursor-pointer { cursor: pointer; }
     </style>
 </head>
 <body class="antialiased">
@@ -449,21 +449,21 @@
             </h2>
             
             <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 gs-fade w-full">
-                <!-- Email Button -->
-                <a class="magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '이메일', '66kk66kk@naver.com')">
+                <!-- Email Button (링크 기능 완전히 제거) -->
+                <div class="cursor-pointer magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '이메일', '66kk66kk@naver.com')">
                     <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
                         <i class="fa-solid fa-envelope text-brand-neon group-hover:text-black text-xl"></i>
                         <span class="font-black text-lg md:text-xl tracking-wide contact-text transition-colors">66kk66kk@naver.com</span>
                     </div>
-                </a>
+                </div>
                 
-                <!-- Phone Button -->
-                <a class="magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '전화번호', '010-2240-4984')">
+                <!-- Phone Button (링크 기능 완전히 제거) -->
+                <div class="cursor-pointer magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '전화번호', '010-2240-4984')">
                     <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
                         <i class="fa-solid fa-phone text-brand-neon group-hover:text-black text-xl"></i>
                         <span class="font-black text-lg md:text-xl tracking-wide contact-text transition-colors">010-2240-4984</span>
                     </div>
-                </a>
+                </div>
             </div>
             
             <div class="mt-40 pt-12 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-6 text-stone-600 text-xs font-bold uppercase tracking-widest">
@@ -509,7 +509,7 @@
             gsap.to(cursorOutline, { x: clientX, y: clientY, duration: 0.5, ease: 'power3.out' });
         });
 
-        const hoverElements = document.querySelectorAll('.hover-trigger, a, button');
+        const hoverElements = document.querySelectorAll('.hover-trigger, a, button, .cursor-pointer');
         hoverElements.forEach(el => {
             el.addEventListener('mouseenter', () => {
                 cursorOutline.style.width = '60px';
@@ -569,10 +569,6 @@
         // 7. Video Player
         function playVideo(container, source) {
             const wrapper = container.classList.contains('video-wrapper') ? container : container.querySelector('.video-wrapper');
-            
-            // 영상 재생 시 커서가 사라지게 했던 로직을 제거하여 마우스가 보이도록 유지
-            // cursorDot.style.opacity = '0'; (기존 로직 주석 처리)
-            // cursorOutline.style.opacity = '0'; (기존 로직 주석 처리)
             
             // source 파일이 .mp4인지 유튜브 ID인지 확인하여 렌더링 분기
             if (source.endsWith('.mp4')) {
@@ -676,7 +672,7 @@
 
         // 9. Contact Click Handler (클립보드 복사 + 디스코드 알림)
         function handleContactClick(e, contactType, value) {
-            e.preventDefault(); // 기본 링크 이동 방지 (빈 창 뜨는 현상 해결)
+            e.preventDefault(); // 기본 링크 이동 방지 (안전 장치)
 
             // 1. 클립보드에 텍스트 복사 (호환성을 위해 execCommand 사용)
             const tempInput = document.createElement("input");
