@@ -55,6 +55,13 @@
             transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1), height 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
+        /* 모바일/터치 디바이스에서는 커스텀 커서 숨김 */
+        @media (pointer: coarse) {
+            #cursor-dot, #cursor-outline {
+                display: none !important;
+            }
+        }
+
         /* Hero Grid Background */
         .grid-bg {
             position: absolute; inset: 0;
@@ -131,7 +138,7 @@
     <!-- 1. Navigation -->
     <nav class="fixed top-0 w-full z-40 px-6 py-8 flex justify-between items-center mix-blend-difference">
         <div class="font-urbanist font-black text-2xl tracking-tighter hover-trigger cursor-pointer">KSH<span class="text-brand-neon">.</span></div>
-        <div class="flex gap-8 text-sm font-bold uppercase tracking-widest">
+        <div class="flex gap-8 text-sm font-bold uppercase tracking-widest hidden md:flex">
             <a href="#works" class="hover-trigger transition-opacity hover:opacity-60">Works</a>
             <a href="#about" class="hover-trigger transition-opacity hover:opacity-60">Process</a>
             <a href="#contact" class="hover-trigger transition-opacity hover:opacity-60">Contact</a>
@@ -193,16 +200,21 @@
                             </div>
                         </div>
                         
-                        <!-- Skill 2 -->
+                        <!-- Skill 2 (Updated Pipeline) -->
                         <div class="flex gap-5 items-start group">
                             <div class="w-12 h-12 rounded-full border border-brand-border bg-black flex items-center justify-center shrink-0 group-hover:border-brand-neon transition-colors">
                                 <i class="fa-solid fa-vr-cardboard text-brand-neon"></i>
                             </div>
                             <div>
-                                <h3 class="text-white font-bold text-lg mb-2 group-hover:text-brand-neon transition-colors">Virtual Avatar Setup</h3>
-                                <p class="text-stone-400 text-sm leading-relaxed">
-                                    실시간 방송에 바로 투입할 수 있는 버추얼 아바타를 세팅합니다. 자연스러운 표정을 위한 세밀한 쉐이프키 작업과 움직임에 생동감을 더하는 다이내믹본 세팅에 집중합니다.
+                                <h3 class="text-white font-bold text-lg mb-2 group-hover:text-brand-neon transition-colors">Virtual Avatar Pipeline</h3>
+                                <p class="text-stone-400 text-sm leading-relaxed mb-2">
+                                    실시간 방송에 바로 투입할 수 있는 최적화된 버추얼 아바타 파이프라인을 구축합니다.
                                 </p>
+                                <ul class="text-stone-500 text-xs font-medium space-y-1 ml-2 border-l-2 border-brand-neon/30 pl-3">
+                                    <li><span class="text-brand-neon">Blender:</span> Auto-Rig Pro를 활용한 정밀한 모델링 및 리깅</li>
+                                    <li><span class="text-brand-neon">Unity:</span> Spring Bone 세팅 및 Toon Shader 최적화</li>
+                                    <li><span class="text-brand-neon">Warudo:</span> 리얼타임 렌더링 및 모션 트래킹 익스포트</li>
+                                </ul>
                             </div>
                         </div>
 
@@ -214,7 +226,7 @@
                             <div>
                                 <h3 class="text-white font-bold text-lg mb-2 group-hover:text-brand-neon transition-colors">Physics Simulation</h3>
                                 <p class="text-stone-400 text-sm leading-relaxed">
-                                    블렌더의 물리 엔진을 활용해 역동적인 씬을 연출합니다. 파티클, 유체, 소프트바디 등 다양한 시뮬레이션을 지속적으로 테스트하고 연구하며 표현의 한계를 넓혀가고 있습니다.
+                                    블렌더의 물리 엔진을 활용해 역동적인 씬을 연출합니다. 파티클, 유체, 소프트바디 등 다양한 시뮬레이션을 연구하여 시각적 표현의 한계를 넓혀가고 있습니다.
                                 </p>
                             </div>
                         </div>
@@ -234,57 +246,54 @@
                         <div class="archive-column flex-1 overflow-hidden cursor-grab select-none" data-direction="1">
                             <div class="archive-wrapper w-full">
                                 <div class="archive-inner flex flex-col gap-4 pb-4">
-                                    <!-- 기존 1차 이미지 5개 -->
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./trickal-diana.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./trickal-diana.jpg" class="w-full h-full object-cover" alt="Trickal Diana 3D 모델링">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./hamburger.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./hamburger.jpg" class="w-full h-full object-cover" alt="햄버거 3D 렌더링">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./dragon-girl.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./dragon-girl.jpg" class="w-full h-full object-cover" alt="드래곤 걸 캐릭터 모델링">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./omurice.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./omurice.jpg" class="w-full h-full object-cover" alt="오므라이스 3D 푸드 스타일링">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./cat.jpg" class="w-full h-full object-cover" alt="프로젝트">
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- 2차 추가 이미지 5개 -->
-                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
-                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./waffle-girl.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./cat.jpg" class="w-full h-full object-cover" alt="고양이 3D 캐릭터">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./Bread-squirrel.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./waffle-girl.jpg" class="w-full h-full object-cover" alt="와플 걸 3D 아트">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./pokemon-fanart.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./Bread-squirrel.jpg" class="w-full h-full object-cover" alt="빵 다람쥐 캐릭터">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./Squirre-lSunflower.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./pokemon-fanart.jpg" class="w-full h-full object-cover" alt="포켓몬 3D 팬아트">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./destruction.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./Squirre-lSunflower.jpg" class="w-full h-full object-cover" alt="해바라기와 다람쥐 3D 씬">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./destruction.jpg" class="w-full h-full object-cover" alt="파괴 시뮬레이션 테스트">
                                         </div>
                                     </div>
                                 </div>
@@ -295,57 +304,54 @@
                         <div class="archive-column flex-1 overflow-hidden cursor-grab select-none" data-direction="-1">
                             <div class="archive-wrapper w-full">
                                 <div class="archive-inner flex flex-col gap-4 pb-4">
-                                    <!-- 기존 1차 이미지 5개 -->
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./dream-tiger.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./dream-tiger.jpg" class="w-full h-full object-cover" alt="드림 타이거 3D 렌더링">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./Halloween.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./Halloween.jpg" class="w-full h-full object-cover" alt="할로윈 테마 3D 아트">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./flower-background.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./flower-background.jpg" class="w-full h-full object-cover" alt="꽃 배경 3D 렌더링">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./martial-arts.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./martial-arts.jpg" class="w-full h-full object-cover" alt="무술 캐릭터 애니메이션">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./monster.jpg" class="w-full h-full object-cover" alt="프로젝트">
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- 2차 추가 이미지 5개 -->
-                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
-                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./Stone-bridge.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./monster.jpg" class="w-full h-full object-cover" alt="몬스터 크리처 모델링">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./Snow-Fire.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./Stone-bridge.jpg" class="w-full h-full object-cover" alt="돌다리 환경 모델링">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./light-whale.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./Snow-Fire.jpg" class="w-full h-full object-cover" alt="눈과 불 파티클 시뮬레이션">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./running.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./light-whale.jpg" class="w-full h-full object-cover" alt="빛나는 고래 3D 애니메이션">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./glass-bottle.jpg" class="w-full h-full object-cover" alt="프로젝트">
+                                            <img src="./running.jpg" class="w-full h-full object-cover" alt="달리기 모션 캡쳐 데이터">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./glass-bottle.jpg" class="w-full h-full object-cover" alt="유리병 재질 렌더링">
                                         </div>
                                     </div>
                                 </div>
@@ -372,9 +378,9 @@
             <div class="group mb-40 gs-fade">
                 <div class="grid lg:grid-cols-12 gap-12 items-center">
                     <div class="lg:col-span-7 order-2 lg:order-1">
-                        <div class="video-wrapper hover-trigger shadow-2xl shadow-brand-neon/5" onclick="playVideo(this, 'P8ZCVqonuC0')">
-                            <!-- 유튜브 공식 썸네일 URL 연결 -->
-                            <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/P8ZCVqonuC0/maxresdefault.jpg');"></div>
+                        <div class="video-wrapper hover-trigger shadow-2xl shadow-brand-neon/5 bg-stone-900" onclick="playVideo(this, 'P8ZCVqonuC0')">
+                            <!-- 유튜브 공식 썸네일 URL 연결 (Fallback 적용) -->
+                            <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/P8ZCVqonuC0/maxresdefault.jpg'), url('https://img.youtube.com/vi/P8ZCVqonuC0/hqdefault.jpg');"></div>
                             <div class="play-btn"><i class="fa-solid fa-play ml-1"></i></div>
                             <div class="absolute bottom-6 left-6 flex gap-2">
                                 <span class="tag bg-black/50 backdrop-blur-md border-brand-neon/30 text-brand-neon">AI 기획</span>
@@ -437,9 +443,9 @@
                         </div>
                     </div>
                     <div class="lg:col-span-7">
-                        <div class="video-wrapper hover-trigger shadow-2xl shadow-teal-400/5" onclick="playVideo(this, 'EsTZYuJ5cZ8')">
+                        <div class="video-wrapper hover-trigger shadow-2xl shadow-teal-400/5 bg-stone-900" onclick="playVideo(this, 'EsTZYuJ5cZ8')">
                             <!-- 유튜브 공식 썸네일 URL 연결 -->
-                            <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/EsTZYuJ5cZ8/maxresdefault.jpg');"></div>
+                            <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/EsTZYuJ5cZ8/maxresdefault.jpg'), url('https://img.youtube.com/vi/EsTZYuJ5cZ8/hqdefault.jpg');"></div>
                             <div class="play-btn !bg-teal-400"><i class="fa-solid fa-play ml-1"></i></div>
                             <div class="absolute bottom-6 left-6 flex gap-2">
                                 <span class="tag bg-black/50 backdrop-blur-md border-teal-400/30 text-teal-400">Virtual Human</span>
@@ -452,50 +458,50 @@
         </div>
     </section>
 
-    <!-- 5. R&D Lab (Simulations) -->
+    <!-- 5. Physics Simulation R&D -->
     <section class="py-40 px-6 bg-[#080808]" id="rnd">
         <div class="max-w-7xl mx-auto">
             <div class="mb-20 text-center gs-fade">
-                <h2 class="text-4xl md:text-5xl font-black mb-4">Physics R&D Lab</h2>
-                <p class="text-stone-500 uppercase tracking-[0.2em] text-xs font-bold">블렌더 물리 엔진 및 시뮬레이션 연구</p>
+                <h2 class="text-4xl md:text-5xl font-black mb-4">Physics Simulation R&D</h2>
+                <p class="text-stone-500 uppercase tracking-[0.2em] text-xs font-bold">블렌더 물리 엔진 기반의 다이내믹 시뮬레이션 및 모션 그래픽</p>
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Card 1 -->
                 <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'Bie57Opktyk')">
-                    <div class="video-wrapper !aspect-square mb-4">
-                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/Bie57Opktyk/maxresdefault.jpg');"></div>
+                    <div class="video-wrapper !aspect-square mb-4 bg-stone-900">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/Bie57Opktyk/maxresdefault.jpg'), url('https://img.youtube.com/vi/Bie57Opktyk/hqdefault.jpg');"></div>
                         <div class="play-btn !w-14 !h-14 !text-base">Play</div>
                     </div>
                     <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">눈 불꽃 (Snow Spark)</h4>
-                    <p class="text-[11px] text-stone-500 uppercase font-black">파티클 및 화염방사기 연산</p>
+                    <p class="text-[11px] text-stone-500 font-medium">파티클 시스템을 활용한 화염방사기 물리 연산 및 시각화</p>
                 </div>
                 <!-- Card 2 -->
                 <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'XN8qbA3e2YI')" style="transition-delay: 0.1s">
-                    <div class="video-wrapper !aspect-square mb-4">
-                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/XN8qbA3e2YI/maxresdefault.jpg');"></div>
+                    <div class="video-wrapper !aspect-square mb-4 bg-stone-900">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/XN8qbA3e2YI/maxresdefault.jpg'), url('https://img.youtube.com/vi/XN8qbA3e2YI/hqdefault.jpg');"></div>
                         <div class="play-btn !w-14 !h-14 !text-base">Play</div>
                     </div>
                     <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">초콜릿 (Chocolate)</h4>
-                    <p class="text-[11px] text-stone-500 uppercase font-black">모디파이어 및 파티클 활용</p>
+                    <p class="text-[11px] text-stone-500 font-medium">Cell Fracture 및 리지드바디(Rigid Body) 파괴 시뮬레이션</p>
                 </div>
                 <!-- Card 3 -->
                 <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'w8osKpDN8vU')" style="transition-delay: 0.2s">
-                    <div class="video-wrapper !aspect-square mb-4">
-                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/w8osKpDN8vU/maxresdefault.jpg');"></div>
+                    <div class="video-wrapper !aspect-square mb-4 bg-stone-900">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/w8osKpDN8vU/maxresdefault.jpg'), url('https://img.youtube.com/vi/w8osKpDN8vU/hqdefault.jpg');"></div>
                         <div class="play-btn !w-14 !h-14 !text-base">Play</div>
                     </div>
                     <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">테트리스 (Tetris)</h4>
-                    <p class="text-[11px] text-stone-500 uppercase font-black">피직스 소프트 바디 애니메이션</p>
+                    <p class="text-[11px] text-stone-500 font-medium">소프트바디(Soft Body) 물리 엔진을 적용한 키네틱 모션</p>
                 </div>
                 <!-- Card 4 -->
                 <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'hl0i3sP4390')" style="transition-delay: 0.3s">
-                    <div class="video-wrapper !aspect-square mb-4">
-                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/hl0i3sP4390/maxresdefault.jpg');"></div>
+                    <div class="video-wrapper !aspect-square mb-4 bg-stone-900">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/hl0i3sP4390/maxresdefault.jpg'), url('https://img.youtube.com/vi/hl0i3sP4390/hqdefault.jpg');"></div>
                         <div class="play-btn !w-14 !h-14 !text-base">Play</div>
                     </div>
-                    <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">액체 시뮬레이션</h4>
-                    <p class="text-[11px] text-stone-500 uppercase font-black">유체 역학 및 렌더링</p>
+                    <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">액체 시뮬레이션 (Fluid)</h4>
+                    <p class="text-[11px] text-stone-500 font-medium">유체 역학(Fluid Dynamics) 연산 및 사실적인 렌더링 연구</p>
                 </div>
             </div>
         </div>
@@ -510,7 +516,7 @@
             </h2>
             
             <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 gs-fade w-full">
-                <!-- Email Button (링크 기능 완전히 제거) -->
+                <!-- Email Button -->
                 <div class="cursor-pointer magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '이메일', '66kk66kk@naver.com')">
                     <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
                         <i class="fa-solid fa-envelope text-brand-neon group-hover:text-black text-xl"></i>
@@ -518,7 +524,7 @@
                     </div>
                 </div>
                 
-                <!-- Phone Button (링크 기능 완전히 제거) -->
+                <!-- Phone Button -->
                 <div class="cursor-pointer magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '전화번호', '010-2240-4984')">
                     <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
                         <i class="fa-solid fa-phone text-brand-neon group-hover:text-black text-xl"></i>
@@ -563,7 +569,11 @@
         const cursorDot = document.getElementById('cursor-dot');
         const cursorOutline = document.getElementById('cursor-outline');
         
+        // 터치 기기 여부 확인 (터치 기기면 커서 애니메이션 실행 안함)
+        const isTouchDevice = () => window.matchMedia("(pointer: coarse)").matches;
+
         window.addEventListener('mousemove', (e) => {
+            if (isTouchDevice()) return;
             const { clientX, clientY } = e;
             
             gsap.to(cursorDot, { x: clientX, y: clientY, duration: 0 });
@@ -573,12 +583,14 @@
         const hoverElements = document.querySelectorAll('.hover-trigger, a, button, .cursor-pointer');
         hoverElements.forEach(el => {
             el.addEventListener('mouseenter', () => {
+                if (isTouchDevice()) return;
                 cursorOutline.style.width = '60px';
                 cursorOutline.style.height = '60px';
                 cursorOutline.style.borderColor = '#deff9a';
                 cursorOutline.style.backgroundColor = 'rgba(222, 255, 154, 0.1)';
             });
             el.addEventListener('mouseleave', () => {
+                if (isTouchDevice()) return;
                 cursorOutline.style.width = '40px';
                 cursorOutline.style.height = '40px';
                 cursorOutline.style.borderColor = 'rgba(222, 255, 154, 0.4)';
@@ -617,12 +629,14 @@
         const magneticWraps = document.querySelectorAll('.magnetic-wrap');
         magneticWraps.forEach(wrap => {
             wrap.addEventListener('mousemove', (e) => {
+                if (isTouchDevice()) return;
                 const rect = wrap.getBoundingClientRect();
                 const x = e.clientX - rect.left - rect.width / 2;
                 const y = e.clientY - rect.top - rect.height / 2;
                 gsap.to(wrap, { x: x * 0.3, y: y * 0.3, duration: 0.5, ease: 'power2.out' });
             });
             wrap.addEventListener('mouseleave', () => {
+                if (isTouchDevice()) return;
                 gsap.to(wrap, { x: 0, y: 0, duration: 1, ease: 'elastic.out(1, 0.3)' });
             });
         });
@@ -688,13 +702,14 @@
             col.addEventListener('touchstart', (e) => {
                 isDown = true;
                 startY = e.touches[0].pageY - targetY;
-            });
+            }, { passive: true }); // passive true 권장
+            
             col.addEventListener('touchend', () => { isDown = false; });
             col.addEventListener('touchmove', (e) => {
                 if (!isDown) return;
-                e.preventDefault(); // 스와이프 시 화면 전체가 당겨지는 현상 방지
+                // e.preventDefault(); 제거: 브라우저 기본 스크롤과 충돌 방지
                 targetY = e.touches[0].pageY - startY;
-            }, { passive: false });
+            }, { passive: true });
 
             // 자동 스크롤 루프
             function playScroll() {
@@ -731,11 +746,11 @@
             }, 100); 
         });
 
-        // 9. Contact Click Handler (클립보드 복사 + 디스코드 알림)
+        // 9. Contact Click Handler (클립보드 복사 + 가상 알림)
         function handleContactClick(e, contactType, value) {
             e.preventDefault(); // 기본 링크 이동 방지 (안전 장치)
 
-            // 1. 클립보드에 텍스트 복사 (호환성을 위해 execCommand 사용)
+            // 1. 클립보드에 텍스트 복사
             const tempInput = document.createElement("input");
             tempInput.value = value;
             document.body.appendChild(tempInput);
@@ -754,30 +769,20 @@
                 textSpan.innerText = originalText;
             }, 2000);
 
-            // 3. 디스코드 알림 전송 실행
-            sendDiscordAlert(contactType);
+            // 3. 디스코드 알림 전송 (보안 상 제거됨 - 백엔드 연동 필요)
+            sendDiscordAlertSafe(contactType);
         }
 
-        // 10. Discord 알림 봇 연동
-        function sendDiscordAlert(contactType) {
-            // 👇 전달해주신 디스코드 웹훅 URL 적용 완료!
-            const webhookUrl = "https://discord.com/api/webhooks/1490564264258441237/83rv0jgCo6pzRIQHLkvGqi12agU1lbo1CpHFd8x3H2YArHhKQg98mQlp1-SayHY5Nqvo"; 
-            
-            if (webhookUrl === "여기에_디스코드_웹훅_URL을_붙여넣으세요" || !webhookUrl) {
-                return; // 웹훅 URL을 안 넣으면 작동하지 않음
-            }
-
-            const payload = {
-                content: `🚨 **포트폴리오 새 소식!**\n방금 누군가 포트폴리오에서 **[ ${contactType} ]** 버튼을 클릭했습니다! (시간: ${new Date().toLocaleString('ko-KR')})`
-            };
-
-            fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
-            }).catch(error => console.error("Discord alert failed:", error));
+        // 10. 안전한 알림 처리 (보안 경고)
+        function sendDiscordAlertSafe(contactType) {
+            /* [보안 경고] 
+               디스코드 웹훅 URL은 절대 프론트엔드 코드(HTML/JS)에 노출하면 안 됩니다.
+               악의적인 사용자가 웹훅 주소를 탈취하여 디스코드 서버에 스팸 공격을 할 수 있습니다.
+               실제 서비스에서는 사용자 클릭 이벤트를 본인의 백엔드 서버(Node.js 등)나
+               AWS Lambda, Vercel Functions 같은 서버리스 함수로 전송하고,
+               서버에서 디스코드 API로 메시지를 전송해야 합니다.
+            */
+            console.warn(`[알림 시스템] '${contactType}' 클릭 이벤트 발생. 실제 서버 연동이 필요합니다.`);
         }
     </script>
 </body>
