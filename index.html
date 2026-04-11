@@ -246,6 +246,7 @@
                         <div class="archive-column flex-1 overflow-hidden cursor-grab select-none" data-direction="1">
                             <div class="archive-wrapper w-full">
                                 <div class="archive-inner flex flex-col gap-4 pb-4">
+                                    <!-- 1차~3차 이미지 11개 -->
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
                                             <img src="./trickal-diana.jpg" class="w-full h-full object-cover" alt="Trickal Diana 3D 모델링">
@@ -273,7 +274,7 @@
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./waffle-girl.jpg" class="w-full h-full object-cover" alt="Elf character">
+                                            <img src="./waffle-girl.jpg" class="w-full h-full object-cover" alt="와플 걸 3D 아트">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
@@ -296,6 +297,11 @@
                                             <img src="./destruction.jpg" class="w-full h-full object-cover" alt="파괴 시뮬레이션 테스트">
                                         </div>
                                     </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./Elf%20character.jpg" class="w-full h-full object-cover" alt="엘프 캐릭터 3D 모델링">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -304,6 +310,7 @@
                         <div class="archive-column flex-1 overflow-hidden cursor-grab select-none" data-direction="-1">
                             <div class="archive-wrapper w-full">
                                 <div class="archive-inner flex flex-col gap-4 pb-4">
+                                    <!-- 1차~3차 이미지 11개 -->
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
                                             <img src="./dream-tiger.jpg" class="w-full h-full object-cover" alt="드림 타이거 3D 렌더링">
@@ -352,6 +359,11 @@
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
                                             <img src="./glass-bottle.jpg" class="w-full h-full object-cover" alt="유리병 재질 렌더링">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./study-room.jpg" class="w-full h-full object-cover" alt="서재 및 불꽃놀이 3D 씬">
                                         </div>
                                     </div>
                                 </div>
@@ -707,7 +719,6 @@
             col.addEventListener('touchend', () => { isDown = false; });
             col.addEventListener('touchmove', (e) => {
                 if (!isDown) return;
-                // e.preventDefault(); 제거: 브라우저 기본 스크롤과 충돌 방지
                 targetY = e.touches[0].pageY - startY;
             }, { passive: true });
 
@@ -746,7 +757,7 @@
             }, 100); 
         });
 
-        // 9. Contact Click Handler (클립보드 복사 + 가상 알림)
+        // 9. Contact Click Handler (클립보드 복사 + 디스코드 알림)
         function handleContactClick(e, contactType, value) {
             e.preventDefault(); // 기본 링크 이동 방지 (안전 장치)
 
@@ -769,20 +780,30 @@
                 textSpan.innerText = originalText;
             }, 2000);
 
-            // 3. 디스코드 알림 전송 (보안 상 제거됨 - 백엔드 연동 필요)
-            sendDiscordAlertSafe(contactType);
+            // 3. 디스코드 알림 전송 실행
+            sendDiscordAlert(contactType);
         }
 
-        // 10. 안전한 알림 처리 (보안 경고)
-        function sendDiscordAlertSafe(contactType) {
-            /* [보안 경고] 
-               디스코드 웹훅 URL은 절대 프론트엔드 코드(HTML/JS)에 노출하면 안 됩니다.
-               악의적인 사용자가 웹훅 주소를 탈취하여 디스코드 서버에 스팸 공격을 할 수 있습니다.
-               실제 서비스에서는 사용자 클릭 이벤트를 본인의 백엔드 서버(Node.js 등)나
-               AWS Lambda, Vercel Functions 같은 서버리스 함수로 전송하고,
-               서버에서 디스코드 API로 메시지를 전송해야 합니다.
-            */
-            console.warn(`[알림 시스템] '${contactType}' 클릭 이벤트 발생. 실제 서버 연동이 필요합니다.`);
+        // 10. Discord 알림 봇 연동
+        function sendDiscordAlert(contactType) {
+            // 👇 설정하신 디스코드 웹훅 주소 유지
+            const webhookUrl = "https://discord.com/api/webhooks/1490564264258441237/83rv0jgCo6pzRIQHLkvGqi12agU1lbo1CpHFd8x3H2YArHhKQg98mQlp1-SayHY5Nqvo"; 
+            
+            if (webhookUrl === "여기에_디스코드_웹훅_URL을_붙여넣으세요" || !webhookUrl) {
+                return;
+            }
+
+            const payload = {
+                content: `🚨 **포트폴리오 새 소식!**\n방금 누군가 포트폴리오에서 **[ ${contactType} ]** 버튼을 클릭했습니다! (시간: ${new Date().toLocaleString('ko-KR')})`
+            };
+
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload)
+            }).catch(error => console.error("Discord alert failed:", error));
         }
     </script>
 </body>
