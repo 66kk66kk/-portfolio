@@ -139,6 +139,7 @@
     <nav class="fixed top-0 w-full z-40 px-6 py-8 flex justify-between items-center mix-blend-difference">
         <div class="font-urbanist font-black text-2xl tracking-tighter hover-trigger cursor-pointer">KSH<span class="text-brand-neon">.</span></div>
         <div class="flex gap-8 text-sm font-bold uppercase tracking-widest hidden md:flex">
+            <a href="#showreel" class="hover-trigger transition-opacity hover:opacity-60 text-brand-neon">Showreel</a>
             <a href="#works" class="hover-trigger transition-opacity hover:opacity-60">Works</a>
             <a href="#about" class="hover-trigger transition-opacity hover:opacity-60">Process</a>
             <a href="#contact" class="hover-trigger transition-opacity hover:opacity-60">Contact</a>
@@ -170,14 +171,38 @@
             </div>
 
             <div class="mt-20 gs-fade">
-                <div class="animate-bounce text-stone-600">
-                    <i class="fa-solid fa-chevron-down"></i>
+                <a href="#showreel" class="animate-bounce text-brand-neon text-2xl inline-block hover-trigger">
+                    <i class="fa-solid fa-circle-play"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Main Showreel Section (신규 추가) -->
+    <section class="py-12 px-6 relative z-10" id="showreel">
+        <div class="max-w-7xl mx-auto gs-fade">
+            <div class="text-center mb-8">
+                <span class="text-brand-neon font-black tracking-[0.3em] text-xs uppercase border border-brand-neon/30 px-4 py-2 rounded-full">2026 Technical Artist Showreel</span>
+            </div>
+            <!-- 유튜브 영상 KDC5AfLdARI 연결 -->
+            <div class="video-card group cursor-pointer" onclick="playVideo(this, 'KDC5AfLdARI')">
+                <div class="video-wrapper w-full aspect-video rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(222,255,154,0.08)] border border-brand-neon/30 relative">
+                    <!-- 유튜브 썸네일 이미지 (가장 화질 좋은 maxresdefault 사용) -->
+                    <div class="absolute inset-0 bg-cover bg-center opacity-70 group-hover:opacity-100 transition-opacity duration-700" style="background-image: url('https://img.youtube.com/vi/KDC5AfLdARI/maxresdefault.jpg'), url('https://img.youtube.com/vi/KDC5AfLdARI/hqdefault.jpg');"></div>
+                    <!-- 오버레이 및 플레이 버튼 -->
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-500"></div>
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none">
+                        <div class="w-20 h-20 md:w-28 md:h-28 bg-brand-neon text-black rounded-full flex items-center justify-center text-3xl md:text-4xl mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_40px_rgba(222,255,154,0.4)]">
+                            <i class="fa-solid fa-play ml-2"></i>
+                        </div>
+                        <h2 class="text-white font-urbanist font-black tracking-[0.3em] text-2xl md:text-4xl drop-shadow-2xl">PLAY SHOWREEL</h2>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- 3. Philosophy Section -->
+    <!-- 4. Philosophy Section -->
     <section class="py-40 px-6 relative overflow-hidden bg-brand-card" id="about">
         <div class="max-w-5xl mx-auto">
             <div class="grid md:grid-cols-2 gap-20 items-center">
@@ -299,7 +324,7 @@
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./Elfcharacter.jpg" class="w-full h-full object-cover" alt="Elfcharacter">
+                                            <img src="./Elfcharacter.jpg" class="w-full h-full object-cover" alt="Elf Character">
                                         </div>
                                     </div>
                                 </div>
@@ -375,7 +400,7 @@
         </div>
     </section>
 
-    <!-- 4. Featured Works -->
+    <!-- 5. Featured Works -->
     <section class="py-40 px-6 relative" id="works">
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
@@ -391,7 +416,6 @@
                 <div class="grid lg:grid-cols-12 gap-12 items-center">
                     <div class="lg:col-span-7 order-2 lg:order-1">
                         <div class="video-wrapper hover-trigger shadow-2xl shadow-brand-neon/5 bg-stone-900" onclick="playVideo(this, 'P8ZCVqonuC0')">
-                            <!-- 유튜브 공식 썸네일 URL 연결 (Fallback 적용) -->
                             <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/P8ZCVqonuC0/maxresdefault.jpg'), url('https://img.youtube.com/vi/P8ZCVqonuC0/hqdefault.jpg');"></div>
                             <div class="play-btn"><i class="fa-solid fa-play ml-1"></i></div>
                             <div class="absolute bottom-6 left-6 flex gap-2">
@@ -470,7 +494,7 @@
         </div>
     </section>
 
-    <!-- 5. Physics Simulation R&D -->
+    <!-- 6. Physics Simulation R&D -->
     <section class="py-40 px-6 bg-[#080808]" id="rnd">
         <div class="max-w-7xl mx-auto">
             <div class="mb-20 text-center gs-fade">
@@ -519,7 +543,7 @@
         </div>
     </section>
 
-    <!-- 6. Footer & Contact -->
+    <!-- 7. Footer & Contact -->
     <footer class="py-40 px-6 relative overflow-hidden" id="contact">
         <div class="max-w-7xl mx-auto text-center">
             <span class="text-brand-neon font-black tracking-widest text-xs uppercase block mb-8 gs-fade">Let's create the future</span>
