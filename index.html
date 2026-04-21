@@ -506,17 +506,17 @@
                         </div>
                     </div>
 
-                    <!-- 3분할 턴어라운드 이미지 뷰어 (크기 대폭 확대) -->
+                    <!-- 3분할 턴어라운드 이미지 뷰어 (크기 대폭 확대 및 클릭 이벤트 추가) -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
-                        <div class="rounded-[2rem] overflow-hidden border border-[#1a1a1a] bg-[#0a0a0a] aspect-[4/5] hover:border-[#deff9a] transition-all duration-500 cursor-pointer relative group/img shadow-2xl">
+                        <div class="rounded-[2rem] overflow-hidden border border-[#1a1a1a] bg-[#0a0a0a] aspect-[4/5] hover:border-[#deff9a] transition-all duration-500 cursor-pointer relative group/img shadow-2xl" onclick="openImageModal('./techwear-front.jpg')">
                             <img src="./techwear-front.jpg" class="w-full h-full object-cover object-center opacity-80 group-hover/img:opacity-100 group-hover/img:scale-105 transition-all duration-700" alt="작업복 정면">
                             <div class="absolute bottom-6 left-0 w-full text-center text-[#deff9a] text-[13px] font-black uppercase tracking-[0.2em] opacity-0 group-hover/img:opacity-100 transition-all duration-300 translate-y-2 group-hover/img:translate-y-0 drop-shadow-lg">Front View</div>
                         </div>
-                        <div class="rounded-[2rem] overflow-hidden border border-[#1a1a1a] bg-[#0a0a0a] aspect-[4/5] hover:border-[#deff9a] transition-all duration-500 cursor-pointer relative group/img shadow-2xl">
+                        <div class="rounded-[2rem] overflow-hidden border border-[#1a1a1a] bg-[#0a0a0a] aspect-[4/5] hover:border-[#deff9a] transition-all duration-500 cursor-pointer relative group/img shadow-2xl" onclick="openImageModal('./techwear-side.jpg')">
                             <img src="./techwear-side.jpg" class="w-full h-full object-cover object-center opacity-80 group-hover/img:opacity-100 group-hover/img:scale-105 transition-all duration-700" alt="작업복 측면">
                             <div class="absolute bottom-6 left-0 w-full text-center text-[#deff9a] text-[13px] font-black uppercase tracking-[0.2em] opacity-0 group-hover/img:opacity-100 transition-all duration-300 translate-y-2 group-hover/img:translate-y-0 drop-shadow-lg">Side View</div>
                         </div>
-                        <div class="rounded-[2rem] overflow-hidden border border-[#1a1a1a] bg-[#0a0a0a] aspect-[4/5] hover:border-[#deff9a] transition-all duration-500 cursor-pointer relative group/img shadow-2xl">
+                        <div class="rounded-[2rem] overflow-hidden border border-[#1a1a1a] bg-[#0a0a0a] aspect-[4/5] hover:border-[#deff9a] transition-all duration-500 cursor-pointer relative group/img shadow-2xl" onclick="openImageModal('./techwear-back.jpg')">
                             <img src="./techwear-back.jpg" class="w-full h-full object-cover object-center opacity-80 group-hover/img:opacity-100 group-hover/img:scale-105 transition-all duration-700" alt="작업복 후면">
                             <div class="absolute bottom-6 left-0 w-full text-center text-[#deff9a] text-[13px] font-black uppercase tracking-[0.2em] opacity-0 group-hover/img:opacity-100 transition-all duration-300 translate-y-2 group-hover/img:translate-y-0 drop-shadow-lg">Back View</div>
                         </div>
@@ -621,6 +621,14 @@
             </div>
         </div>
     </footer>
+
+    <!-- Image Lightbox Modal (신규 추가) -->
+    <div id="image-modal" class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="absolute top-6 right-6 md:top-10 md:right-10 text-white text-4xl cursor-pointer hover:text-brand-neon transition-colors z-10" onclick="closeImageModal()">
+            <i class="fa-solid fa-xmark"></i>
+        </div>
+        <img id="modal-image" src="" alt="확대된 이미지" class="max-w-[95vw] max-h-[90vh] object-contain rounded-xl shadow-2xl scale-95 transition-transform duration-300">
+    </div>
 
     <!-- Scripts -->
     <script>
@@ -866,6 +874,35 @@
             */
             console.warn(`[알림 시스템] '${contactType}' 클릭 이벤트 발생. 실제 서버 연동이 필요합니다.`);
         }
+
+        // 11. Image Modal Logic (신규 추가)
+        const imageModal = document.getElementById('image-modal');
+        const modalImage = document.getElementById('modal-image');
+
+        function openImageModal(imageSrc) {
+            if (isTouchDevice()) return; // 터치 기기(모바일) 등에서 원치 않으면 이 줄 유지, 폰에서도 크게 보고 싶다면 이 줄 삭제
+            modalImage.src = imageSrc;
+            imageModal.classList.remove('pointer-events-none');
+            
+            // GSAP를 이용한 부드러운 등장 애니메이션
+            gsap.to(imageModal, { opacity: 1, duration: 0.3, ease: 'power2.out' });
+            gsap.to(modalImage, { scale: 1, duration: 0.4, ease: 'back.out(1.5)' });
+        }
+
+        function closeImageModal() {
+            imageModal.classList.add('pointer-events-none');
+            
+            // GSAP를 이용한 부드러운 퇴장 애니메이션
+            gsap.to(imageModal, { opacity: 0, duration: 0.3, ease: 'power2.in' });
+            gsap.to(modalImage, { scale: 0.95, duration: 0.3, ease: 'power2.in', onComplete: () => { modalImage.src = ''; } });
+        }
+
+        // 모달의 검은 배경 영역 클릭 시 닫기
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) {
+                closeImageModal();
+            }
+        });
     </script>
 </body>
 </html>
