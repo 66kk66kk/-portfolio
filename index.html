@@ -219,17 +219,6 @@
                 <div class="absolute top-4 left-4 md:top-6 md:left-6 z-30 flex flex-col gap-2 w-[160px] md:w-[200px]">
                     <div class="text-brand-neon text-[9px] md:text-[10px] font-black uppercase tracking-widest px-1 drop-shadow-md mb-1"><i class="fa-solid fa-sliders mr-1"></i> TA Control Panel</div>
                     
-                    <!-- Lighting Toggle -->
-                    <div class="relative">
-                        <select id="light-select" class="w-full bg-black/80 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-2 rounded-lg shadow-lg outline-none appearance-none cursor-pointer hover:border-brand-neon/50 transition-colors">
-                            <option value="neutral">💡 조명: Neutral (기본)</option>
-                            <option value="legacy">💡 조명: Studio (스튜디오)</option>
-                            <option value="https://modelviewer.dev/shared-assets/environments/spruit_sunrise_1k_HDR.hdr">💡 조명: Outdoor (야외)</option>
-                            <option value="https://modelviewer.dev/shared-assets/environments/moonless_golf_1k.hdr">💡 조명: Night (야간)</option>
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 text-[10px] pointer-events-none"></i>
-                    </div>
-
                     <!-- Animation Toggle (초기엔 숨김, 애니메이션 로드 시 등장) -->
                     <div class="relative hidden" id="anim-container">
                         <select id="anim-select" class="w-full bg-black/80 backdrop-blur-md border border-brand-neon/30 text-brand-neon text-[10px] md:text-xs font-bold px-3 py-2 rounded-lg shadow-lg outline-none appearance-none cursor-pointer hover:border-brand-neon/80 transition-colors">
@@ -239,13 +228,8 @@
 
                     <div class="flex gap-2 w-full">
                         <!-- Auto-Rotate (Turntable) -->
-                        <button id="rotate-btn" class="bg-brand-neon text-black text-[10px] md:text-[11px] font-bold px-2 py-2 rounded-lg shadow-lg transition-all flex items-center justify-center gap-1.5 flex-1 hover:bg-white">
+                        <button id="rotate-btn" class="bg-brand-neon text-black text-[10px] md:text-[11px] font-bold px-2 py-2 rounded-lg shadow-lg transition-all flex items-center justify-center gap-1.5 w-full hover:bg-white">
                             <i class="fa-solid fa-rotate"></i> 턴테이블
-                        </button>
-
-                        <!-- Material Render Pass (Clay View) -->
-                        <button id="clay-btn" class="bg-black/80 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-[11px] font-bold px-2 py-2 rounded-lg shadow-lg hover:border-brand-neon/50 transition-all flex items-center justify-center gap-1.5 flex-1">
-                            <i class="fa-solid fa-masks-theater"></i> 클레이
                         </button>
                     </div>
                 </div>
@@ -265,11 +249,11 @@
                     </div>
                 </div>
 
+                <!-- 👇 autoplay 속성 제거됨 -->
                 <model-viewer 
                     src="techwear.glb" 
                     alt="Interactive 3D Character" 
                     auto-rotate 
-                    autoplay
                     camera-controls 
                     shadow-intensity="1" 
                     exposure="1"
@@ -861,15 +845,7 @@
 
         // 💡 [NEW] 12. TA Control Panel 로직 모음
         if (modelViewer) {
-            // A. 라이팅 변경 토글
-            const lightSelect = document.getElementById('light-select');
-            if (lightSelect) {
-                lightSelect.addEventListener('change', (e) => {
-                    modelViewer.environmentImage = e.target.value;
-                });
-            }
-
-            // B. 애니메이션 자동 인식 및 재생 로직
+            // A. 애니메이션 자동 인식 및 재생 로직
             modelViewer.addEventListener('load', () => {
                 const animContainer = document.getElementById('anim-container');
                 const animSelect = document.getElementById('anim-select');
@@ -886,12 +862,16 @@
                         animSelect.appendChild(opt);
                     });
                     
-                    // 첫 번째 애니메이션 자동 재생 (autoplay 적용 시)
-                    animSelect.value = modelViewer.availableAnimations[0];
+                    // 기본 애니메이션 동작 정지 및 T-Pose 셋팅
+                    animSelect.value = 'none';
+                    modelViewer.animationName = null;
+                    modelViewer.pause();
 
                     animSelect.addEventListener('change', (e) => {
                         if(e.target.value === 'none') {
+                            modelViewer.animationName = null;
                             modelViewer.pause();
+                            modelViewer.currentTime = 0;
                         } else {
                             modelViewer.animationName = e.target.value;
                             modelViewer.play();
@@ -900,7 +880,7 @@
                 }
             });
 
-            // C. 턴테이블 (자동 회전) 토글
+            // B. 턴테이블 (자동 회전) 토글
             const rotateBtn = document.getElementById('rotate-btn');
             if (rotateBtn) {
                 rotateBtn.addEventListener('click', () => {
@@ -916,72 +896,11 @@
                     }
                 });
             }
-
-            // D. 클레이 뷰 (Material 분해도) 토글
-            const clayBtn = document.getElementById('clay-btn');
-            let isClay = false;
-            
-            if (clayBtn) {
-                clayBtn.addEventListener('click', () => {
-                    isClay = !isClay;
-                    
-                    const symbols = Object.getOwnPropertySymbols(modelViewer);
-                    for (const sym of symbols) {
-                        if (sym.description === 'scene' || sym.toString().includes('scene')) {
-                            const scene = modelViewer[sym];
-                            if (scene && typeof scene.traverse === 'function') {
-                                scene.traverse((node) => {
-                                    if (node.isMesh && !node.userData.isWireframeOverlay && node.material) {
-                                        if (isClay) {
-                                            // 기존 텍스처 및 색상 저장
-                                            if (node.userData.originalMap === undefined) {
-                                                node.userData.originalMap = node.material.map;
-                                                node.userData.originalColor = node.material.color ? node.material.color.clone() : null;
-                                                node.userData.originalRoughness = node.material.roughness;
-                                                node.userData.originalMetalness = node.material.metalness;
-                                            }
-                                            
-                                            // 텍스처 제거 및 클레이 재질로 강제 변환
-                                            node.material.map = null;
-                                            node.material.roughness = 0.8;
-                                            node.material.metalness = 0.0;
-                                            if (node.material.color) {
-                                                node.material.color.set('#aaaaaa'); // 부드러운 회색 점토 색상
-                                            }
-                                            node.material.needsUpdate = true;
-                                        } else {
-                                            // 원본 복구
-                                            node.material.map = node.userData.originalMap;
-                                            node.material.roughness = node.userData.originalRoughness !== undefined ? node.userData.originalRoughness : 1;
-                                            node.material.metalness = node.userData.originalMetalness !== undefined ? node.userData.originalMetalness : 0;
-                                            if (node.userData.originalColor && node.material.color) {
-                                                node.material.color.copy(node.userData.originalColor);
-                                            }
-                                            node.material.needsUpdate = true;
-                                        }
-                                    }
-                                });
-                            }
-                        }
-                    }
-
-                    // 버튼 스타일 업데이트
-                    if (isClay) {
-                        clayBtn.classList.replace('bg-black/80', 'bg-brand-neon');
-                        clayBtn.classList.replace('text-white', 'text-black');
-                        clayBtn.innerHTML = '<i class="fa-solid fa-palette"></i> 솔리드 복구';
-                    } else {
-                        clayBtn.classList.replace('bg-brand-neon', 'bg-black/80');
-                        clayBtn.classList.replace('text-black', 'text-white');
-                        clayBtn.innerHTML = '<i class="fa-solid fa-masks-theater"></i> 클레이';
-                    }
-                });
-            }
         }
 
-        // 💡 13. 폴리곤(Triangles) 개수 계산
+        // 💡 13. 폴리곤(Triangles) 개수 계산 및 뚫림 방지
         const polyCountElement = document.getElementById('poly-count');
-        if (modelViewer && polyCountElement) {
+        if (modelViewer) {
             modelViewer.addEventListener('load', () => {
                 let totalTriangles = 0;
                 
@@ -992,10 +911,21 @@
                         if (scene && typeof scene.traverse === 'function') {
                             scene.traverse((node) => {
                                 if (node.isMesh && node.geometry && !node.userData.isWireframeOverlay) {
+                                    // 1. 폴리곤 수 카운팅
                                     if (node.geometry.index) {
                                         totalTriangles += node.geometry.index.count / 3;
                                     } else if (node.geometry.attributes.position) {
                                         totalTriangles += node.geometry.attributes.position.count / 3;
+                                    }
+
+                                    // 2. 🛠️ 매쉬 뚫림(렌더링) 버그 강제 픽스
+                                    if (node.material) {
+                                        node.material.side = 2; // 양면 렌더링 적용 (뒷면이 투명해지는 현상 방지)
+                                        node.material.depthWrite = true; // 투명도 뎁스 버그 방지
+                                        if (node.material.transparent) {
+                                            node.material.alphaTest = 0.5;
+                                        }
+                                        node.material.needsUpdate = true;
                                     }
                                 }
                             });
@@ -1003,10 +933,12 @@
                     }
                 }
                 
-                if (totalTriangles > 0) {
-                    polyCountElement.innerText = Math.round(totalTriangles).toLocaleString();
-                } else {
-                    polyCountElement.innerText = "N/A";
+                if (polyCountElement) {
+                    if (totalTriangles > 0) {
+                        polyCountElement.innerText = Math.round(totalTriangles).toLocaleString();
+                    } else {
+                        polyCountElement.innerText = "N/A";
+                    }
                 }
             });
         }
