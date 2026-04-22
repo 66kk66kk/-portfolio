@@ -127,7 +127,7 @@
         a, button, .hover-trigger, .cursor-pointer { cursor: pointer; }
     </style>
 </head>
-<body class="antialiased" oncontextmenu="return false;"> <!-- 전체 페이지 우클릭 방지 -->
+<body class="antialiased" oncontextmenu="return false;">
 
     <div class="scroll-progress" id="progress-bar"></div>
     <div id="cursor-dot"></div>
@@ -221,6 +221,9 @@
                     </button>
                 </div>
 
+                <!-- 👇 data-lenis-prevent 속성 추가: 휠(줌) 사용 시 페이지 스크롤 강제 차단 -->
+                <!-- 👇 disable-pan 속성 삭제: 우클릭(이동/패닝) 정상 작동 복구 -->
+                <!-- 👇 oncontextmenu="return false;": 모델 뷰어 안에서 우클릭 팝업 메뉴 차단 -->
                 <model-viewer 
                     src="techwear.glb" 
                     alt="Interactive 3D Character" 
@@ -231,16 +234,21 @@
                     environment-image="neutral"
                     class="w-full h-full outline-none"
                     style="--poster-color: transparent;"
-                    disable-pan <!-- 우클릭/두손가락 패닝(이동) 방지 -->
+                    data-lenis-prevent 
+                    oncontextmenu="return false;"
                 >
                 </model-viewer>
 
-                <div class="absolute bottom-4 md:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 md:gap-4 pointer-events-none w-max">
-                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg flex items-center gap-1.5 md:gap-2">
-                        <i class="fa-solid fa-arrows-rotate text-brand-neon"></i> <span class="hidden sm:inline">좌클릭하여</span> 회전
+                <!-- 조작 안내 UI 직관적 분리 -->
+                <div class="absolute bottom-4 md:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 pointer-events-none w-max">
+                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg flex items-center gap-1.5">
+                        <i class="fa-solid fa-arrows-rotate text-brand-neon"></i> 좌클릭 회전
                     </div>
-                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg items-center gap-1.5 md:gap-2 hidden md:flex">
-                        <i class="fa-solid fa-magnifying-glass text-brand-neon"></i> 스크롤 확대/축소
+                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg items-center gap-1.5 hidden md:flex">
+                        <i class="fa-solid fa-hand text-brand-neon"></i> 우클릭 이동
+                    </div>
+                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg items-center gap-1.5 hidden md:flex">
+                        <i class="fa-solid fa-magnifying-glass text-brand-neon"></i> 휠 줌
                     </div>
                 </div>
             </div>
@@ -692,25 +700,6 @@
             });
         });
 
-        // 💡 3.5 3D 뷰어 이벤트 방지 및 페이지 스크롤 차단
-        const modelViewer = document.querySelector('model-viewer');
-        if (modelViewer) {
-            // 마우스 휠 이벤트 방지
-            modelViewer.addEventListener('wheel', (e) => {
-                e.preventDefault(); 
-            }, { passive: false }); 
-
-            // 모바일 터치 이벤트 방지
-            modelViewer.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-            }, { passive: false });
-
-            // 우클릭 방지 (모델 뷰어 내)
-            modelViewer.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-            });
-        }
-
         // 4. Hero Reveal
         gsap.to('.reveal-text', { y: '0%', duration: 1.5, ease: 'expo.out', stagger: 0.1, delay: 0.5 });
 
@@ -799,13 +788,14 @@
 
         // 💡 11. 와이어프레임 토글 기능 (내부 Three.js Scene 접근)
         const wireframeBtn = document.getElementById('wireframe-btn');
+        const modelViewer = document.querySelector('model-viewer');
         let isWireframe = false;
 
         if (wireframeBtn && modelViewer) {
             wireframeBtn.addEventListener('click', () => {
                 isWireframe = !isWireframe;
                 
-                // model-viewer 내부의 Three.js 심볼(Symbol) 객체를 찾아 Scene에 접근하는 해킹 기법
+                // model-viewer 내부의 Three.js 심볼(Symbol) 객체를 찾아 Scene에 접근
                 const symbols = Object.getOwnPropertySymbols(modelViewer);
                 
                 for (const sym of symbols) {
@@ -813,10 +803,40 @@
                         const scene = modelViewer[sym];
                         if (scene && typeof scene.traverse === 'function') {
                             scene.traverse((node) => {
-                                if (node.isMesh && node.material) {
-                                    // 메쉬의 재질을 와이어프레임으로 강제 변환
-                                    node.material.wireframe = isWireframe;
-                                    node.material.needsUpdate = true;
+                                // 기존 메쉬일 경우에만 작동 (이미 추가한 와이어프레임 메쉬는 제외)
+                                if (node.isMesh && !node.userData.isWireframeOverlay) {
+                                    
+                                    // 이 메쉬에 대해 만들어둔 와이어프레임 복제본이 있는지 확인
+                                    let wfClone = node.children.find(c => c.userData.isWireframeOverlay);
+                                    
+                                    if (!wfClone) {
+                                        // 1. 메쉬 형태만 똑같이 복제
+                                        wfClone = node.clone();
+                                        wfClone.children = []; // 하위 요소 중복 복제 방지
+                                        
+                                        // 2. 재질(Material) 복제 및 반투명 와이어프레임 덧씌우기
+                                        wfClone.material = node.material.clone();
+                                        wfClone.material.wireframe = true;
+                                        wfClone.material.transparent = true;
+                                        wfClone.material.opacity = 0.15; // 반투명도 (0.15 정도가 은은하게 예쁩니다)
+                                        
+                                        // 3. 모델과 와이어프레임이 겹쳐서 깜빡거리는 현상(Z-fighting) 방지
+                                        wfClone.material.polygonOffset = true;
+                                        wfClone.material.polygonOffsetFactor = -1;
+                                        wfClone.material.polygonOffsetUnits = -1;
+                                        
+                                        // 4. 와이어프레임 색상을 테마색인 네온 그린으로 강제 변경
+                                        if (wfClone.material.color) {
+                                            wfClone.material.color.set('#deff9a');
+                                        }
+
+                                        // 식별자 추가 및 부모 노드에 병합
+                                        wfClone.userData.isWireframeOverlay = true;
+                                        node.add(wfClone);
+                                    }
+                                    
+                                    // 토글 상태에 따라 껐다 켜기
+                                    wfClone.visible = isWireframe;
                                 }
                             });
                         }
