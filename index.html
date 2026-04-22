@@ -10,52 +10,121 @@
     <link href="https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&family=Pretendard:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
+    <!-- Scripts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-    <!-- 3D 모델 뷰어를 위한 구글 model-viewer 스크립트 -->
+    <!-- 👇 3D 모델 뷰어를 위한 구글 model-viewer 스크립트 추가 -->
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Pretendard', 'sans-serif'], urbanist: ['Urbanist', 'sans-serif'] },
-                    colors: { brand: { neon: '#deff9a', dark: '#050505', card: '#0a0a0a', border: '#1a1a1a' } }
+                    fontFamily: {
+                        sans: ['Pretendard', 'sans-serif'],
+                        urbanist: ['Urbanist', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            neon: '#deff9a',
+                            dark: '#050505',
+                            card: '#0a0a0a',
+                            border: '#1a1a1a',
+                        }
+                    }
                 }
             }
         }
     </script>
 
     <style>
+        /* 커서 설정을 default로 변경하여 마우스 포인터가 보이게 함 */
         body { background-color: #050505; color: #f5f5f5; cursor: default; overflow-x: hidden; }
         ::-webkit-scrollbar { display: none; }
 
-        /* Custom Scrollbar for Facial Panel */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; display: block; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #deff9a; border-radius: 10px; }
-
-        /* Facial Slider Styling */
-        .facial-slider { -webkit-appearance: none; width: 100%; height: 4px; background: #222; border-radius: 2px; outline: none; }
-        .facial-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; appearance: none; width: 14px; height: 14px;
-            background: #deff9a; border-radius: 50%; cursor: pointer;
-            box-shadow: 0 0 10px rgba(222, 255, 154, 0.4); border: 2px solid #000;
+        /* Custom Cursor */
+        #cursor-dot {
+            position: fixed; top: 0; left: 0; width: 8px; height: 8px;
+            background-color: #deff9a; border-radius: 50%;
+            transform: translate(-50%, -50%); z-index: 9999; pointer-events: none;
+        }
+        #cursor-outline {
+            position: fixed; top: 0; left: 0; width: 40px; height: 40px;
+            border: 1px solid rgba(222, 255, 154, 0.4); border-radius: 50%;
+            transform: translate(-50%, -50%); z-index: 9998; pointer-events: none;
+            transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1), height 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        #cursor-dot { position: fixed; top: 0; left: 0; width: 8px; height: 8px; background-color: #deff9a; border-radius: 50%; transform: translate(-50%, -50%); z-index: 9999; pointer-events: none; }
-        #cursor-outline { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border: 1px solid rgba(222, 255, 154, 0.4); border-radius: 50%; transform: translate(-50%, -50%); z-index: 9998; pointer-events: none; transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1), height 0.4s cubic-bezier(0.23, 1, 0.32, 1); }
-        @media (pointer: coarse) { #cursor-dot, #cursor-outline { display: none !important; } }
+        /* 모바일/터치 디바이스에서는 커스텀 커서 숨김 */
+        @media (pointer: coarse) {
+            #cursor-dot, #cursor-outline { display: none !important; }
+        }
 
+        /* Hero Grid Background */
+        .grid-bg {
+            position: absolute; inset: 0;
+            background-image: linear-gradient(rgba(222, 255, 154, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(222, 255, 154, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            mask-image: radial-gradient(circle at center, black, transparent 80%);
+            z-index: -1;
+        }
+
+        .noise-overlay {
+            position: fixed; inset: 0;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.03; pointer-events: none; z-index: 50;
+        }
+
+        /* Text Reveal */
         .reveal-mask { overflow: hidden; display: block; }
         .reveal-text { display: block; transform: translateY(110%); }
-        .video-wrapper { position: relative; overflow: hidden; border-radius: 20px; border: 1px solid #1a1a1a; background: #0a0a0a; aspect-ratio: 16/9; cursor: pointer; }
-        .tag { padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255,255,255,0.1); }
-        .text-gradient { background: linear-gradient(135deg, #deff9a 0%, #a7f3d0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .scroll-progress { position: fixed; top: 0; left: 0; width: 0%; height: 3px; background: #deff9a; z-index: 100; }
+
+        /* Project Cards */
+        .video-card { transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+        .video-wrapper { 
+            position: relative; overflow: hidden; border-radius: 20px; 
+            border: 1px solid #1a1a1a; background: #0a0a0a;
+            aspect-ratio: 16/9; cursor: pointer;
+        }
+        .video-wrapper:hover { border-color: #deff9a; }
+        
+        .play-btn {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+            width: 80px; height: 80px; background: rgba(222, 255, 154, 0.9);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            color: #000; font-size: 24px; opacity: 0; transition: all 0.4s ease;
+        }
+        .video-wrapper:hover .play-btn { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+        .tag {
+            padding: 4px 12px; border-radius: 100px; font-size: 11px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Magnetic Button */
+        .magnetic-wrap { display: inline-block; transition: transform 0.3s ease-out; }
+
+        /* Text Gradient */
+        .text-gradient {
+            background: linear-gradient(135deg, #deff9a 0%, #a7f3d0 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        .scroll-progress {
+            position: fixed; top: 0; left: 0; width: 0%; height: 3px;
+            background: #deff9a; z-index: 100;
+        }
+
+        .mask-vertical {
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+
+        a, button, .hover-trigger, .cursor-pointer { cursor: pointer; }
     </style>
 </head>
 <body class="antialiased" oncontextmenu="return false;">
@@ -63,71 +132,134 @@
     <div class="scroll-progress" id="progress-bar"></div>
     <div id="cursor-dot"></div>
     <div id="cursor-outline"></div>
+    <div class="noise-overlay"></div>
 
+    <!-- 1. Navigation -->
     <nav class="fixed top-0 w-full z-40 px-6 py-8 flex justify-between items-center mix-blend-difference">
-        <div class="font-urbanist font-black text-2xl tracking-tighter">KSH<span class="text-brand-neon">.</span></div>
+        <div class="font-urbanist font-black text-2xl tracking-tighter hover-trigger cursor-pointer">KSH<span class="text-brand-neon">.</span></div>
+        <div class="flex gap-6 text-sm font-bold uppercase tracking-widest hidden md:flex">
+            <a href="#showreel" class="hover-trigger transition-opacity hover:opacity-60 text-brand-neon">Showreel</a>
+            <a href="#3d-viewer" class="hover-trigger transition-opacity hover:opacity-60">3D Character</a>
+            <a href="#works" class="hover-trigger transition-opacity hover:opacity-60">Works</a>
+            <a href="#about" class="hover-trigger transition-opacity hover:opacity-60">Process</a>
+            <a href="#contact" class="hover-trigger transition-opacity hover:opacity-60">Contact</a>
+        </div>
     </nav>
 
-    <!-- 3D Viewer Section -->
-    <section class="py-20 px-6 relative z-10" id="3d-viewer">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-8">
-                <span class="text-brand-neon font-black tracking-[0.3em] text-xs uppercase border border-brand-neon/30 px-4 py-2 rounded-full">Interactive Technical Showcase</span>
+    <!-- 2. Hero Section -->
+    <section class="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
+        <div class="grid-bg"></div>
+        <div id="hero-glow" class="absolute w-[800px] h-[800px] bg-brand-neon/5 blur-[150px] rounded-full pointer-events-none transition-transform duration-1000 ease-out"></div>
+        
+        <div class="w-full max-w-7xl mx-auto flex flex-col items-center text-center mt-10">
+            <div class="reveal-mask mb-8">
+                <span class="reveal-text text-brand-neon text-xs font-black tracking-[0.3em] uppercase bg-brand-neon/10 py-2 px-6 rounded-full border border-brand-neon/20">
+                    Precision in Motion & Space
+                </span>
             </div>
             
-            <div class="w-full h-[700px] md:h-[850px] rounded-[2rem] border border-brand-border bg-[#080808] relative overflow-hidden shadow-2xl">
-                
-                <!-- TA Control Panel -->
-                <div class="absolute top-6 left-6 z-30 flex flex-col gap-3 w-[200px] md:w-[260px]">
-                    <div class="text-brand-neon text-[10px] font-black uppercase tracking-widest px-1 drop-shadow-md flex items-center gap-2">
-                        <i class="fa-solid fa-sliders"></i> TA Control Panel
+            <h1 class="text-[clamp(3rem,15vw,180px)] leading-[0.85] font-black tracking-tighter uppercase font-urbanist mb-12">
+                <div class="reveal-mask"><span class="reveal-text">KIM SUNG</span></div>
+                <div class="reveal-mask"><span class="reveal-text text-brand-neon">HO<span class="text-white">.</span></span></div>
+            </h1>
+            
+            <div class="max-w-xl gs-fade">
+                <p class="text-stone-400 text-lg md:text-xl font-medium leading-relaxed">
+                    데이터를 시각화하고, 시스템을 예술로 승화시키는<br>
+                    <span class="text-white">3D 모션 & 버추얼 테크니컬 아티스트입니다.</span>
+                </p>
+            </div>
+
+            <div class="mt-16 gs-fade">
+                <a href="#showreel" class="animate-bounce text-brand-neon text-2xl inline-block hover-trigger">
+                    <i class="fa-solid fa-chevron-down"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Main Showreel Section -->
+    <section class="py-20 px-6 relative z-10" id="showreel">
+        <div class="max-w-7xl mx-auto gs-fade">
+            <div class="text-center mb-8">
+                <span class="text-brand-neon font-black tracking-[0.2em] md:tracking-[0.3em] text-[10px] md:text-xs uppercase border border-brand-neon/30 px-4 py-2 rounded-full">Technical Artist Showreel</span>
+            </div>
+            
+            <div class="video-card group cursor-pointer" onclick="playVideo(this, 'KDC5AfLdARI')">
+                <div class="video-wrapper w-full aspect-video rounded-2xl md:rounded-[2rem] overflow-hidden shadow-[0_0_30px_rgba(222,255,154,0.08)] border border-brand-neon/30 relative bg-stone-900">
+                    <div class="absolute inset-0 bg-cover bg-center opacity-70 group-hover:opacity-100 transition-opacity duration-700" style="background-image: url('https://img.youtube.com/vi/KDC5AfLdARI/maxresdefault.jpg'), url('https://img.youtube.com/vi/KDC5AfLdARI/hqdefault.jpg');"></div>
+                    <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-500"></div>
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none w-full">
+                        <div class="w-16 h-16 md:w-28 md:h-28 bg-brand-neon text-black rounded-full flex items-center justify-center text-2xl md:text-4xl mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_40px_rgba(222,255,154,0.4)]">
+                            <i class="fa-solid fa-play ml-1 md:ml-2"></i>
+                        </div>
+                        <h2 class="text-white font-urbanist font-black tracking-[0.1em] md:tracking-[0.3em] text-xl md:text-4xl drop-shadow-2xl text-center">PLAY SHOWREEL</h2>
                     </div>
+                </div>
+            </div>
+
+            <div class="mt-6 md:mt-8 flex flex-wrap justify-center gap-2 md:gap-3">
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-cubes mr-1 md:mr-2 text-brand-neon"></i>Blender</span>
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-video mr-1 md:mr-2 text-brand-neon"></i>Premiere Pro</span>
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-wand-magic-sparkles mr-1 md:mr-2 text-brand-neon"></i>Motion Graphics</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Interactive 3D Character -->
+    <section class="py-20 px-6 relative z-10 bg-brand-card/50" id="3d-viewer">
+        <div class="max-w-7xl mx-auto gs-fade">
+            <div class="text-center mb-8">
+                <span class="text-brand-neon font-black tracking-[0.2em] md:tracking-[0.3em] text-[10px] md:text-xs uppercase border border-brand-neon/30 px-4 py-2 rounded-full">Interactive 3D Character</span>
+            </div>
+            
+            <div class="w-full h-[500px] md:h-[750px] rounded-2xl md:rounded-[2rem] border border-brand-border bg-[#111] relative overflow-hidden shadow-2xl gs-fade cursor-grab active:cursor-grabbing">
+                
+                <!-- 💡 [NEW] TA Control Panel (좌측 상단) -->
+                <div class="absolute top-4 left-4 md:top-6 md:left-6 z-30 flex flex-col gap-2 w-[160px] md:w-[200px]">
+                    <div class="text-brand-neon text-[9px] md:text-[10px] font-black uppercase tracking-widest px-1 drop-shadow-md mb-1"><i class="fa-solid fa-sliders mr-1"></i> TA Control Panel</div>
                     
-                    <!-- Animation Selection -->
+                    <!-- Animation Toggle (초기엔 숨김, 애니메이션 로드 시 등장) -->
                     <div class="hidden flex-col gap-2" id="anim-container">
                         <div class="relative">
-                            <select id="anim-select" class="w-full bg-black/80 backdrop-blur-md border border-brand-neon/20 text-white text-[11px] font-bold px-3 py-2.5 rounded-xl shadow-lg outline-none appearance-none cursor-pointer hover:border-brand-neon/50 transition-all">
+                            <select id="anim-select" class="w-full bg-black/80 backdrop-blur-md border border-brand-neon/30 text-brand-neon text-[10px] md:text-xs font-bold px-3 py-2 rounded-lg shadow-lg outline-none appearance-none cursor-pointer hover:border-brand-neon/80 transition-colors">
                             </select>
                             <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-brand-neon/50 text-[10px] pointer-events-none"></i>
                         </div>
-                        <button id="anim-play-btn" class="bg-black/80 backdrop-blur-md border border-brand-neon/30 text-brand-neon text-[11px] font-black px-2 py-2.5 rounded-xl shadow-lg hover:bg-brand-neon hover:text-black transition-all flex items-center justify-center gap-2 w-full opacity-50 pointer-events-none">
+                        
+                        <!-- 👇 애니메이션 재생/일시정지 버튼 -->
+                        <button id="anim-play-btn" class="bg-black/80 backdrop-blur-md border border-brand-neon/50 text-brand-neon text-[10px] md:text-[11px] font-bold px-2 py-2 rounded-lg shadow-lg hover:bg-brand-neon hover:text-black transition-all flex items-center justify-center gap-1.5 w-full opacity-50 pointer-events-none">
                             <i class="fa-solid fa-play"></i> 재생
                         </button>
                     </div>
 
-                    <!-- Facial Control Toggle -->
-                    <button id="facial-toggle-btn" class="bg-black/80 backdrop-blur-md border border-white/10 text-white text-[11px] font-bold px-2 py-2.5 rounded-xl shadow-lg hover:border-brand-neon/50 transition-all flex items-center justify-center gap-2 w-full">
-                        <i class="fa-solid fa-face-smile-wink"></i> 페이셜 제어 (Facial)
-                    </button>
-
-                    <!-- Facial Sliders Panel (Scrollable) -->
-                    <div id="facial-panel" class="hidden flex-col gap-4 bg-black/95 backdrop-blur-2xl border border-white/10 p-5 rounded-2xl shadow-2xl w-full max-h-[400px] overflow-y-auto custom-scrollbar overflow-x-hidden">
-                        <div class="text-[10px] text-stone-400 font-black uppercase tracking-[0.2em] mb-1 border-b border-white/5 pb-2 flex justify-between">
-                            <span>Morph Targets</span>
-                            <span id="morph-count" class="text-brand-neon">0</span>
-                        </div>
-                        <div id="facial-sliders-list" class="flex flex-col gap-5">
-                            <div class="text-[10px] text-stone-600 italic">모델 분석 중...</div>
-                        </div>
+                    <div class="flex gap-2 w-full mt-1">
+                        <!-- Auto-Rotate (Turntable) -->
+                        <button id="rotate-btn" class="bg-brand-neon text-black text-[10px] md:text-[11px] font-bold px-2 py-2 rounded-lg shadow-lg transition-all flex items-center justify-center gap-1.5 w-full hover:bg-white">
+                            <i class="fa-solid fa-rotate"></i> 턴테이블
+                        </button>
                     </div>
+                </div>
 
-                    <button id="rotate-btn" class="bg-brand-neon text-black text-[11px] font-black px-2 py-2.5 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 w-full hover:bg-white">
-                        <i class="fa-solid fa-rotate"></i> 턴테이블
+                <!-- 기존 우측 상단 기능 (와이어프레임 토글) -->
+                <div class="absolute top-4 right-4 md:top-6 md:right-6 z-20">
+                    <button id="wireframe-btn" class="bg-black/80 backdrop-blur-md border border-brand-neon/50 text-brand-neon text-[10px] md:text-xs font-bold px-3 py-2 md:px-4 md:py-2 rounded-lg shadow-lg hover:bg-brand-neon hover:text-black transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-border-all"></i> <span class="hidden sm:inline">와이어프레임</span>
                     </button>
                 </div>
 
-                <!-- Wireframe Toggle -->
-                <div class="absolute top-6 right-6 z-20">
-                    <button id="wireframe-btn" class="bg-black/80 backdrop-blur-md border border-brand-neon/50 text-brand-neon text-[11px] font-bold px-4 py-2.5 rounded-xl shadow-lg hover:bg-brand-neon hover:text-black transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-border-all"></i> 와이어프레임
-                    </button>
+                <!-- 폴리곤(Triangles) 카운트 -->
+                <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-20">
+                    <div class="bg-black/80 backdrop-blur-md border border-white/10 text-white text-[9px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg shadow-lg flex flex-col items-end gap-1">
+                        <span class="text-stone-400 uppercase tracking-widest text-[8px] md:text-[10px]">Polygons (Tris)</span>
+                        <span id="poly-count" class="text-brand-neon font-urbanist text-sm md:text-base tracking-wider">Calculating...</span>
+                    </div>
                 </div>
 
-                <!-- Model Viewer -->
+                <!-- animation-name="none" 속성을 유지하여 첫 번째 애니메이션 강제 적용을 차단 -->
                 <model-viewer 
-                    id="main-viewer"
                     src="techwear.glb" 
-                    alt="3D Character" 
+                    alt="Interactive 3D Character" 
                     auto-rotate 
                     camera-controls 
                     shadow-intensity="1" 
@@ -136,226 +268,835 @@
                     class="w-full h-full outline-none"
                     style="--poster-color: transparent;"
                     data-lenis-prevent 
+                    oncontextmenu="return false;"
                     min-camera-orbit="auto auto 0.1m"
                     min-field-of-view="10deg"
+                    animation-name="none"
                 >
                 </model-viewer>
 
-                <!-- Poly Count -->
-                <div class="absolute bottom-6 right-6 z-20">
-                    <div class="bg-black/80 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold px-4 py-2.5 rounded-xl shadow-lg flex flex-col items-end gap-1">
-                        <span class="text-stone-500 uppercase tracking-widest text-[9px]">Triangles</span>
-                        <span id="poly-count" class="text-brand-neon font-urbanist text-base tracking-wider">Calculating...</span>
-                    </div>
-                </div>
-
-                <!-- Controls Info -->
-                <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 pointer-events-none w-max">
-                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold px-4 py-2 rounded-full shadow-lg flex items-center gap-2">
+                <div class="absolute bottom-4 md:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 pointer-events-none w-max">
+                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg flex items-center gap-1.5">
                         <i class="fa-solid fa-arrows-rotate text-brand-neon"></i> 좌클릭 회전
                     </div>
-                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] font-bold px-4 py-2 rounded-full shadow-lg hidden md:flex items-center gap-2">
+                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg items-center gap-1.5 hidden md:flex">
                         <i class="fa-solid fa-hand text-brand-neon"></i> 우클릭 이동
+                    </div>
+                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg items-center gap-1.5 hidden md:flex">
+                        <i class="fa-solid fa-magnifying-glass text-brand-neon"></i> 휠 줌
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 md:mt-8 flex flex-wrap justify-center gap-2 md:gap-3">
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-cubes mr-1 md:mr-2 text-brand-neon"></i>Blender</span>
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-video mr-1 md:mr-2 text-brand-neon"></i>Premiere Pro</span>
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-wand-magic-sparkles mr-1 md:mr-2 text-brand-neon"></i>Motion Graphics</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Philosophy & Process Section -->
+    <section class="py-40 px-6 relative overflow-hidden bg-brand-card" id="about">
+        <div class="max-w-5xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-20 items-center">
+                <div class="gs-fade">
+                    <h2 class="text-4xl md:text-5xl font-black leading-tight mb-10">
+                        상상을 현실로 만드는<br><span class="text-gradient">테크니컬 워크플로우</span>
+                    </h2>
+                    
+                    <div class="flex flex-col gap-10 mb-10">
+                        <div class="flex gap-5 items-start group">
+                            <div class="w-12 h-12 rounded-full border border-brand-border bg-black flex items-center justify-center shrink-0 group-hover:border-brand-neon transition-colors">
+                                <i class="fa-solid fa-film text-brand-neon"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-bold text-lg mb-2 group-hover:text-brand-neon transition-colors">Creative Motion & Edit</h3>
+                                <p class="text-stone-400 text-sm leading-relaxed">
+                                    단순히 3D 모델링을 넘어, 영상의 호흡과 리듬을 설계합니다. 감각적인 트랜지션과 키네틱 타이포그래피를 활용해 시청자의 몰입도를 높이는 모션 그래픽을 제작합니다.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-5 items-start group">
+                            <div class="w-12 h-12 rounded-full border border-brand-border bg-black flex items-center justify-center shrink-0 group-hover:border-brand-neon transition-colors">
+                                <i class="fa-solid fa-vr-cardboard text-brand-neon"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-bold text-lg mb-2 group-hover:text-brand-neon transition-colors">Virtual Avatar Pipeline</h3>
+                                <p class="text-stone-400 text-sm leading-relaxed mb-4">
+                                    실시간 방송에 바로 투입할 수 있는 최적화된 버추얼 아바타 파이프라인을 구축합니다.
+                                </p>
+                                <div class="bg-black/50 border border-white/10 rounded-xl p-4 inline-block">
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 text-xs font-black tracking-wider">
+                                        <div class="flex flex-col">
+                                            <span class="text-white uppercase">Blender</span>
+                                            <span class="text-brand-neon font-medium mt-1">Auto-Rig Pro</span>
+                                        </div>
+                                        <i class="fa-solid fa-arrow-right text-stone-600 hidden sm:block mx-1"></i>
+                                        <i class="fa-solid fa-arrow-down text-stone-600 sm:hidden"></i>
+                                        <div class="flex flex-col">
+                                            <span class="text-white uppercase">Unity 3D</span>
+                                            <span class="text-brand-neon font-medium mt-1">Spring Bone / Toon Shader</span>
+                                        </div>
+                                        <i class="fa-solid fa-arrow-right text-stone-600 hidden sm:block mx-1"></i>
+                                        <i class="fa-solid fa-arrow-down text-stone-600 sm:hidden"></i>
+                                        <div class="flex flex-col">
+                                            <span class="text-white uppercase">Warudo</span>
+                                            <span class="text-brand-neon font-medium mt-1">리얼타임 송출</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-5 items-start group">
+                            <div class="w-12 h-12 rounded-full border border-brand-border bg-black flex items-center justify-center shrink-0 group-hover:border-brand-neon transition-colors">
+                                <i class="fa-solid fa-fire-flame-curved text-brand-neon"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-white font-bold text-lg mb-2 group-hover:text-brand-neon transition-colors">Physics Simulation</h3>
+                                <p class="text-stone-400 text-sm leading-relaxed">
+                                    블렌더의 물리 엔진을 활용해 역동적인 씬을 연출합니다. 파티클, 유체, 소프트바디 등 다양한 시뮬레이션을 연구하여 시각적 표현의 한계를 넓혀가고 있습니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex gap-4">
+                        <span class="tag">#3DMotion</span>
+                        <span class="tag">#VirtualHuman</span>
+                        <span class="tag">#Simulation</span>
+                    </div>
+                </div>
+                
+                <!-- Continuous R&D Wall (22 Images) -->
+                <div class="relative gs-fade h-[600px] w-full">
+                    <div class="absolute inset-0 rounded-3xl border border-brand-border bg-black/40 overflow-hidden flex gap-4 p-4 mask-vertical shadow-2xl shadow-brand-neon/5">
+                        
+                        <!-- Column 1 -->
+                        <div class="archive-column flex-1 overflow-hidden cursor-grab select-none" data-direction="1">
+                            <div class="archive-wrapper w-full">
+                                <div class="archive-inner flex flex-col gap-4 pb-4">
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./trickal-diana.jpg" class="w-full h-full object-cover" alt="Trickal Diana">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./hamburger.jpg" class="w-full h-full object-cover" alt="Hamburger">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./dragon-girl.jpg" class="w-full h-full object-cover" alt="Dragon Girl">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./omurice.jpg" class="w-full h-full object-cover" alt="Omurice">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./cat.jpg" class="w-full h-full object-cover" alt="Black Cat">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./waffle-girl.jpg" class="w-full h-full object-cover" alt="Waffle Girl">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./Bread-squirrel.jpg" class="w-full h-full object-cover" alt="Bread Squirrel">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./pokemon-fanart.jpg" class="w-full h-full object-cover" alt="Pokemon Fanart">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./Squirre-lSunflower.jpg" class="w-full h-full object-cover" alt="Squirrel Sunflower">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./destruction.jpg" class="w-full h-full object-cover" alt="Destruction">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./Elfcharacter.jpg" class="w-full h-full object-cover" alt="Elf Character">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Column 2 -->
+                        <div class="archive-column flex-1 overflow-hidden cursor-grab select-none" data-direction="-1">
+                            <div class="archive-wrapper w-full">
+                                <div class="archive-inner flex flex-col gap-4 pb-4">
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./dream-tiger.jpg" class="w-full h-full object-cover" alt="Dream Tiger">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./Halloween.jpg" class="w-full h-full object-cover" alt="Halloween">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./flower-background.jpg" class="w-full h-full object-cover" alt="Flower Background">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./martial-arts.jpg" class="w-full h-full object-cover" alt="Martial Arts">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./monster.jpg" class="w-full h-full object-cover" alt="Monster">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./Stone-bridge.jpg" class="w-full h-full object-cover" alt="Stone Bridge">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./Snow-Fire.jpg" class="w-full h-full object-cover" alt="Snow Fire">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./light-whale.jpg" class="w-full h-full object-cover" alt="Light Whale">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./running.jpg" class="w-full h-full object-cover" alt="Running">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./glass-bottle.jpg" class="w-full h-full object-cover" alt="Glass Bottle">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./study-room.jpg" class="w-full h-full object-cover" alt="Study Room">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <footer class="py-20 px-6 text-center text-stone-600 text-[10px] font-bold uppercase tracking-widest border-t border-brand-border mt-20">
-        <p>© 2026 KIM SUNG HO. Technical Artist Portfolio</p>
+    <!-- 6. Featured Works -->
+    <section class="py-40 px-6 relative" id="works">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
+                <div class="gs-fade">
+                    <span class="text-brand-neon font-black tracking-widest text-xs uppercase block mb-4">Portfolio Highlights</span>
+                    <h2 class="text-6xl md:text-8xl font-black tracking-tighter uppercase font-urbanist leading-none">Works<span class="text-brand-neon">.</span></h2>
+                </div>
+                <p class="text-stone-500 max-w-xs text-sm gs-fade">기획부터 모델링, 시뮬레이션, 포스트 프로덕션까지 모든 공정을 완수한 프로젝트들입니다.</p>
+            </div>
+
+            <!-- Project 01 -->
+            <div class="group mb-40 gs-fade">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-7 order-2 lg:order-1">
+                        <div class="video-wrapper hover-trigger shadow-2xl shadow-brand-neon/5 bg-stone-900" onclick="playVideo(this, 'P8ZCVqonuC0')">
+                            <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/P8ZCVqonuC0/maxresdefault.jpg'), url('https://img.youtube.com/vi/P8ZCVqonuC0/hqdefault.jpg');"></div>
+                            <div class="play-btn"><i class="fa-solid fa-play ml-1"></i></div>
+                            <div class="absolute bottom-6 left-6 flex gap-2">
+                                <span class="tag bg-black/50 backdrop-blur-md border-brand-neon/30 text-brand-neon">AI 기획</span>
+                                <span class="tag bg-black/50 backdrop-blur-md">Motion Graphics</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-5 order-1 lg:order-2">
+                        <span class="text-brand-neon font-black text-sm mb-4 block">01 / AI PLANNED PORTFOLIO</span>
+                        <h3 class="text-4xl font-bold mb-6 group-hover:text-brand-neon transition-colors">AI 기획 기반 영상 포트폴리오</h3>
+                        <p class="text-stone-400 text-lg leading-relaxed mb-8">
+                            제미나이 AI를 활용하여 기획된 모션 그래픽 포트폴리오입니다. 그래픽 매치, 키네틱 타이포, 스매시 컷 등 다양한 편집 기술을 적용하여 몰입감 높은 연출을 완성했습니다.
+                        </p>
+                        <div class="p-6 rounded-2xl border border-brand-border bg-brand-card/50">
+                            <h4 class="text-xs font-black uppercase tracking-widest text-stone-500 mb-4">Core Skills</h4>
+                            <div class="flex gap-6">
+                                <div class="text-center">
+                                    <i class="fa-solid fa-cubes text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">Blender</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa-solid fa-scissors text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">Premiere</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa-solid fa-wand-magic-sparkles text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">FX</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Project 02 -->
+            <div class="group mb-40 gs-fade">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-5">
+                        <span class="text-teal-400 font-black text-sm mb-4 block">02 / VIRTUAL SYSTEM</span>
+                        <h3 class="text-4xl font-bold mb-6 group-hover:text-teal-400 transition-colors">실시간 버추얼 아바타 파이프라인</h3>
+                        <p class="text-stone-400 text-lg leading-relaxed mb-8">
+                            라이브 스트리밍 및 리얼타임 렌더링에 최적화된 버추얼 캐릭터 세팅입니다. 페이셜 트래킹을 위한 세밀한 블렌드쉐이프 작업과 다이내믹본(물리 연산) 최적화를 통해 자연스러운 움직임을 구현했습니다.
+                        </p>
+                        <div class="p-6 rounded-2xl border border-brand-border bg-brand-card/50">
+                            <h4 class="text-xs font-black uppercase tracking-widest text-stone-500 mb-4">Core Skills</h4>
+                            <div class="flex gap-6">
+                                <div class="text-center">
+                                    <i class="fa-solid fa-user-astronaut text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">Rigging</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa-brands fa-unity text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">Unity</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fa-solid fa-mobile-screen text-2xl mb-2 text-stone-300"></i>
+                                    <p class="text-[10px] font-bold text-stone-500 uppercase">Tracking</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-7">
+                        <div class="video-wrapper hover-trigger shadow-2xl shadow-teal-400/5 bg-stone-900" onclick="playVideo(this, 'EsTZYuJ5cZ8')">
+                            <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/EsTZYuJ5cZ8/maxresdefault.jpg'), url('https://img.youtube.com/vi/EsTZYuJ5cZ8/hqdefault.jpg');"></div>
+                            <div class="play-btn !bg-teal-400"><i class="fa-solid fa-play ml-1"></i></div>
+                            <div class="absolute bottom-6 left-6 flex gap-2">
+                                <span class="tag bg-black/50 backdrop-blur-md border-teal-400/30 text-teal-400">Virtual Human</span>
+                                <span class="tag bg-black/50 backdrop-blur-md">Unity 3D</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. Simulation Breakdown & R&D -->
+    <section class="py-40 px-6 bg-[#080808]" id="rnd">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20 text-center gs-fade">
+                <h2 class="text-4xl md:text-5xl font-black mb-4">Simulation Breakdown & R&D</h2>
+                <p class="text-stone-500 uppercase tracking-[0.2em] text-xs font-bold">물리 시뮬레이션 및 노드 셋업 브레이크다운</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'Bie57Opktyk')">
+                    <div class="video-wrapper !aspect-square mb-4 bg-stone-900">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/Bie57Opktyk/maxresdefault.jpg'), url('https://img.youtube.com/vi/Bie57Opktyk/hqdefault.jpg');"></div>
+                        <div class="play-btn !w-14 !h-14 !text-base">Play</div>
+                    </div>
+                    <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">눈 불꽃 (Snow Spark)</h4>
+                    <p class="text-[11px] text-stone-500 font-medium">파티클 시스템을 활용한 화염방사기 물리 연산 및 시각화</p>
+                </div>
+                <!-- Card 2 -->
+                <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'XN8qbA3e2YI')" style="transition-delay: 0.1s">
+                    <div class="video-wrapper !aspect-square mb-4 bg-stone-900">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/XN8qbA3e2YI/maxresdefault.jpg'), url('https://img.youtube.com/vi/XN8qbA3e2YI/hqdefault.jpg');"></div>
+                        <div class="play-btn !w-14 !h-14 !text-base">Play</div>
+                    </div>
+                    <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">초콜릿 (Chocolate)</h4>
+                    <p class="text-[11px] text-stone-500 font-medium">Cell Fracture 및 리지드바디(Rigid Body) 파괴 시뮬레이션</p>
+                </div>
+                <!-- Card 3 -->
+                <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'w8osKpDN8vU')" style="transition-delay: 0.2s">
+                    <div class="video-wrapper !aspect-square mb-4 bg-stone-900">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/w8osKpDN8vU/maxresdefault.jpg'), url('https://img.youtube.com/vi/w8osKpDN8vU/hqdefault.jpg');"></div>
+                        <div class="play-btn !w-14 !h-14 !text-base">Play</div>
+                    </div>
+                    <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">테트리스 (Tetris)</h4>
+                    <p class="text-[11px] text-stone-500 font-medium">소프트바디(Soft Body) 물리 엔진을 적용한 키네틱 모션</p>
+                </div>
+                <!-- Card 4 -->
+                <div class="video-card group gs-fade cursor-pointer" onclick="playVideo(this, 'hl0i3sP4390')" style="transition-delay: 0.3s">
+                    <div class="video-wrapper !aspect-square mb-4 bg-stone-900">
+                        <div class="absolute inset-0 bg-cover bg-center opacity-60 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/hl0i3sP4390/maxresdefault.jpg'), url('https://img.youtube.com/vi/hl0i3sP4390/hqdefault.jpg');"></div>
+                        <div class="play-btn !w-14 !h-14 !text-base">Play</div>
+                    </div>
+                    <h4 class="font-bold text-sm mb-1 group-hover:text-brand-neon transition-colors tracking-tight">액체 시뮬레이션 (Fluid)</h4>
+                    <p class="text-[11px] text-stone-500 font-medium">유체 역학(Fluid Dynamics) 연산 및 사실적인 렌더링 연구</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 8. Footer & Contact -->
+    <footer class="py-40 px-6 relative overflow-hidden" id="contact">
+        <div class="max-w-7xl mx-auto text-center">
+            <span class="text-brand-neon font-black tracking-widest text-xs uppercase block mb-8 gs-fade">Let's create the future</span>
+            <h2 class="text-5xl md:text-[120px] font-black font-urbanist uppercase tracking-tighter leading-none mb-20 gs-fade">
+                Work with <span class="text-brand-neon">Me</span>
+            </h2>
+            
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 gs-fade w-full">
+                <!-- Email Button -->
+                <a href="mailto:66kk66kk@naver.com" class="cursor-pointer magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '이메일', '66kk66kk@naver.com')">
+                    <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
+                        <i class="fa-solid fa-envelope text-brand-neon group-hover:text-black text-xl"></i>
+                        <span class="font-black text-lg md:text-xl tracking-wide contact-text transition-colors">66kk66kk@naver.com</span>
+                    </div>
+                </a>
+                
+                <!-- Phone Button -->
+                <a href="tel:010-2240-4984" class="cursor-pointer magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '전화번호', '010-2240-4984')">
+                    <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
+                        <i class="fa-solid fa-phone text-brand-neon group-hover:text-black text-xl"></i>
+                        <span class="font-black text-lg md:text-xl tracking-wide contact-text transition-colors">010-2240-4984</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="mt-40 pt-12 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-6 text-stone-600 text-xs font-bold uppercase tracking-widest">
+                <p>© 2026 KIM SUNG HO. All Rights Reserved.</p>
+                <p>Designed with Analytical Passion</p>
+            </div>
+        </div>
     </footer>
 
+    <!-- Scripts -->
     <script>
-        // 1. Smooth Scroll Init
-        const lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smooth: true });
-        function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+        // 1. Lenis Smooth Scroll
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            smooth: true,
+        });
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
         requestAnimationFrame(raf);
 
-        const modelViewer = document.getElementById('main-viewer');
-
-        // 2. 3D Viewer Global Fixes
-        window.addEventListener('contextmenu', (e) => { e.preventDefault(); e.stopPropagation(); return false; }, { capture: true });
-        if (modelViewer) {
-            modelViewer.addEventListener('wheel', (e) => e.preventDefault(), { passive: false });
-            modelViewer.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
-        }
-
-        // 3. Main Logic
-        modelViewer.addEventListener('load', () => {
-            const symbols = Object.getOwnPropertySymbols(modelViewer);
-            const sceneSymbol = symbols.find(s => s.description === 'scene');
-            const scene = modelViewer[sceneSymbol];
-            
-            if (!scene) return;
-
-            // --- 💡 [FIX 1] 강제 T-Pose 보장 로직 ---
-            modelViewer.pause();
-            modelViewer.currentTime = 0;
-            // 모델 뷰어의 애니메이션 상태를 완전히 초기화하기 위해 강제 할당 후 제거
-            modelViewer.animationName = "none_fallback"; 
-            setTimeout(() => { modelViewer.removeAttribute('animation-name'); }, 50);
-
-            // --- 💡 [FIX 2] 메쉬 뚫림 방지 및 데이터 추출 ---
-            let totalTriangles = 0;
-            const morphTargetsMap = new Map(); // Name -> Array of Meshes
-            const uniqueMorphs = new Set();
-
-            scene.traverse((node) => {
-                if (node.isMesh) {
-                    // 렌더링 퀄리티 수정 (매쉬 뚫림 해결)
-                    if (node.material) {
-                        node.material.side = 2; // Double Sided
-                        node.material.depthWrite = true;
-                        if (node.material.transparent) node.material.alphaTest = 0.5;
-                        node.material.needsUpdate = true;
-                    }
-
-                    // 폴리곤 카운트 (와이어프레임 제외)
-                    if (node.geometry && !node.userData.isWireframeOverlay) {
-                        totalTriangles += (node.geometry.index ? node.geometry.index.count : node.geometry.attributes.position.count) / 3;
-                    }
-
-                    // 쉐이프키 데이터 수집
-                    if (node.morphTargetDictionary) {
-                        Object.keys(node.morphTargetDictionary).forEach((name) => {
-                            if (!morphTargetsMap.has(name)) morphTargetsMap.set(name, []);
-                            morphTargetsMap.get(name).push(node);
-                            uniqueMorphs.add(name);
-                        });
-                    }
-                }
-            });
-
-            // 업데이트 UI
-            document.getElementById('poly-count').innerText = Math.round(totalTriangles).toLocaleString();
-            document.getElementById('morph-count').innerText = uniqueMorphs.size;
-
-            // --- 💡 [FIX 3] 페이셜 슬라이더 생성 ---
-            const slidersList = document.getElementById('facial-sliders-list');
-            slidersList.innerHTML = '';
-            
-            const sortedMorphs = Array.from(uniqueMorphs).sort();
-            if (sortedMorphs.length === 0) {
-                slidersList.innerHTML = '<div class="text-[10px] text-stone-600 italic">페이셜 데이터가 없습니다.</div>';
-            } else {
-                sortedMorphs.forEach((name) => {
-                    const group = document.createElement('div');
-                    group.className = 'flex flex-col gap-2 group';
-                    group.innerHTML = `
-                        <div class="flex justify-between items-center text-[9px] font-mono tracking-tight">
-                            <span class="text-white/60 group-hover:text-white transition-colors">${name}</span>
-                            <span class="text-brand-neon font-bold" id="val-${name}">0</span>
-                        </div>
-                        <input type="range" min="0" max="1" step="0.01" value="0" class="facial-slider" data-morph="${name}">
-                    `;
-                    slidersList.appendChild(group);
-
-                    const slider = group.querySelector('input');
-                    slider.addEventListener('input', (e) => {
-                        const val = parseFloat(e.target.value);
-                        document.getElementById(`val-${name}`).innerText = Math.round(val * 100);
-                        // 해당 이름을 가진 모든 메쉬 동시 업데이트 (동기화)
-                        morphTargetsMap.get(name).forEach(mesh => {
-                            const idx = mesh.morphTargetDictionary[name];
-                            mesh.morphTargetInfluences[idx] = val;
-                        });
-                    });
-                });
-            }
-
-            // --- 🎬 애니메이션 제어부 ---
-            const animContainer = document.getElementById('anim-container');
-            const animSelect = document.getElementById('anim-select');
-            const animPlayBtn = document.getElementById('anim-play-btn');
-            let isPlaying = false;
-
-            if (modelViewer.availableAnimations.length > 0) {
-                animContainer.classList.replace('hidden', 'flex');
-                animSelect.innerHTML = '<option value="none">🎬 동작: 기본 T-Pose (Rest)</option>';
-                modelViewer.availableAnimations.forEach(a => {
-                    const opt = document.createElement('option');
-                    opt.value = a; opt.innerText = `🎬 동작: ${a}`;
-                    animSelect.appendChild(opt);
-                });
-
-                animSelect.addEventListener('change', (e) => {
-                    if (e.target.value === 'none') {
-                        modelViewer.removeAttribute('animation-name');
-                        modelViewer.pause();
-                        modelViewer.currentTime = 0;
-                        isPlaying = false;
-                        animPlayBtn.classList.add('opacity-50', 'pointer-events-none');
-                    } else {
-                        modelViewer.animationName = e.target.value;
-                        modelViewer.play();
-                        isPlaying = true;
-                        animPlayBtn.classList.remove('opacity-50', 'pointer-events-none');
-                        animPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 일시정지';
-                    }
-                });
-
-                animPlayBtn.addEventListener('click', () => {
-                    if (isPlaying) { modelViewer.pause(); animPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> 재생'; }
-                    else { modelViewer.play(); animPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 일시정지'; }
-                    isPlaying = !isPlaying;
-                });
-            }
+        // 2. GSAP & Scroll Management
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Scroll Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById("progress-bar").style.width = scrolled + "%";
         });
 
-        // 4. UI Toggle Buttons
-        const facialToggleBtn = document.getElementById('facial-toggle-btn');
-        const facialPanel = document.getElementById('facial-panel');
-        facialToggleBtn.addEventListener('click', () => {
-            facialPanel.classList.toggle('hidden');
-            facialPanel.classList.toggle('flex');
-        });
-
-        const rotateBtn = document.getElementById('rotate-btn');
-        rotateBtn.addEventListener('click', () => {
-            modelViewer.autoRotate = !modelViewer.autoRotate;
-            rotateBtn.classList.toggle('bg-brand-neon'); rotateBtn.classList.toggle('text-black');
-            rotateBtn.classList.toggle('bg-black/80'); rotateBtn.classList.toggle('text-white');
-            rotateBtn.innerHTML = modelViewer.autoRotate ? '<i class="fa-solid fa-rotate"></i> 턴테이블' : '<i class="fa-solid fa-pause"></i> 정지됨';
-        });
-
-        // 5. Wireframe Overlay Logic
-        const wireframeBtn = document.getElementById('wireframe-btn');
-        let isWireframe = false;
-        wireframeBtn.addEventListener('click', () => {
-            isWireframe = !isWireframe;
-            const symbols = Object.getOwnPropertySymbols(modelViewer);
-            const scene = modelViewer[symbols.find(s => s.description === 'scene')];
-            
-            scene.traverse((node) => {
-                if (node.isMesh && !node.userData.isWireframeOverlay) {
-                    let wfClone = node.children.find(c => c.userData.isWireframeOverlay);
-                    if (!wfClone) {
-                        wfClone = node.clone(); wfClone.children = [];
-                        if (node.isSkinnedMesh) wfClone.bind(node.skeleton, node.bindMatrix);
-                        wfClone.material = node.material.clone();
-                        wfClone.material.wireframe = true; wfClone.material.transparent = true; wfClone.material.opacity = 0.8;
-                        wfClone.material.map = wfClone.material.normalMap = wfClone.material.roughnessMap = wfClone.material.metalnessMap = wfClone.material.emissiveMap = null;
-                        wfClone.material.polygonOffset = true; wfClone.material.polygonOffsetFactor = -4; wfClone.material.polygonOffsetUnits = -4;
-                        wfClone.material.color.set('#ffffff'); wfClone.material.emissive.set('#ffffff'); wfClone.material.emissiveIntensity = 1.0;
-                        wfClone.userData.isWireframeOverlay = true; node.add(wfClone);
-                    }
-                    wfClone.visible = isWireframe;
-                }
-            });
-            if (isWireframe) { wireframeBtn.classList.replace('bg-black/80', 'bg-brand-neon'); wireframeBtn.classList.replace('text-brand-neon', 'text-black'); }
-            else { wireframeBtn.classList.replace('bg-brand-neon', 'bg-black/80'); wireframeBtn.classList.replace('text-black', 'text-brand-neon'); }
-        });
-
-        // 6. Custom Cursor
+        // 3. Custom Cursor
         const cursorDot = document.getElementById('cursor-dot');
         const cursorOutline = document.getElementById('cursor-outline');
+        
+        const isTouchDevice = () => window.matchMedia("(pointer: coarse)").matches;
+
         window.addEventListener('mousemove', (e) => {
-            const isTouchDevice = () => window.matchMedia("(pointer: coarse)").matches;
             if (isTouchDevice()) return;
-            gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0 });
-            gsap.to(cursorOutline, { x: e.clientX, y: e.clientY, duration: 0.5, ease: 'power3.out' });
+            const { clientX, clientY } = e;
+            gsap.to(cursorDot, { x: clientX, y: clientY, duration: 0 });
+            gsap.to(cursorOutline, { x: clientX, y: clientY, duration: 0.5, ease: 'power3.out' });
         });
+
+        const hoverElements = document.querySelectorAll('.hover-trigger, a, button, .cursor-pointer, select');
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                if (isTouchDevice()) return;
+                cursorOutline.style.width = '60px';
+                cursorOutline.style.height = '60px';
+                cursorOutline.style.borderColor = '#deff9a';
+                cursorOutline.style.backgroundColor = 'rgba(222, 255, 154, 0.1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                if (isTouchDevice()) return;
+                cursorOutline.style.width = '40px';
+                cursorOutline.style.height = '40px';
+                cursorOutline.style.borderColor = 'rgba(222, 255, 154, 0.4)';
+                cursorOutline.style.backgroundColor = 'transparent';
+            });
+        });
+
+        // 💡 3.5 3D 뷰어 이벤트 방지 및 페이지 스크롤 차단
+        const modelViewer = document.querySelector('model-viewer');
+        
+        // 🚨 크롬 등 모든 브라우저에서 우클릭 메뉴(컨텍스트 메뉴) 완벽 강제 차단 (Capture 단계)
+        window.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }, { capture: true });
+
+        // 마우스 다운 시 우클릭 버튼 자체의 기본 동작 방어막 추가
+        window.addEventListener('mousedown', (e) => {
+            if (e.button === 2 || e.button === 3) {
+                e.preventDefault();
+            }
+        }, { capture: true });
+
+        if (modelViewer) {
+            // 마우스 휠 이벤트 방지
+            modelViewer.addEventListener('wheel', (e) => {
+                e.preventDefault(); 
+            }, { passive: false }); 
+
+            // 모바일 터치 이벤트 방지
+            modelViewer.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+        }
+
+        // 4. Hero Reveal
+        gsap.to('.reveal-text', { y: '0%', duration: 1.5, ease: 'expo.out', stagger: 0.1, delay: 0.5 });
+
+        // Background Glow Follow
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 60;
+            const y = (e.clientY / window.innerHeight - 0.5) * 60;
+            gsap.to('#hero-glow', { x, y, duration: 1.5, ease: 'power2.out' });
+        });
+
+        // 5. Scroll Fade Up
+        gsap.utils.toArray('.gs-fade').forEach(el => {
+            gsap.fromTo(el, 
+                { opacity: 0, y: 30 },
+                { scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none reverse" }, opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
+            );
+        });
+
+        // 6. Magnetic Effect
+        const magneticWraps = document.querySelectorAll('.magnetic-wrap');
+        magneticWraps.forEach(wrap => {
+            wrap.addEventListener('mousemove', (e) => {
+                if (isTouchDevice()) return;
+                const rect = wrap.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                gsap.to(wrap, { x: x * 0.3, y: y * 0.3, duration: 0.5, ease: 'power2.out' });
+            });
+            wrap.addEventListener('mouseleave', () => {
+                if (isTouchDevice()) return;
+                gsap.to(wrap, { x: 0, y: 0, duration: 1, ease: 'elastic.out(1, 0.3)' });
+            });
+        });
+
+        // 7. Video Player
+        function playVideo(container, source) {
+            const wrapper = container.classList.contains('video-wrapper') ? container : container.querySelector('.video-wrapper');
+            
+            if (source.endsWith('.mp4')) {
+                wrapper.innerHTML = `<video class="absolute inset-0 w-full h-full object-cover" controls autoplay><source src="${source}" type="video/mp4"></video>`;
+            } else {
+                wrapper.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${source}?autoplay=1&mute=0&rel=0&modestbranding=1" class="absolute inset-0 w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            }
+            wrapper.onclick = null;
+            wrapper.style.cursor = 'default';
+        }
+
+        // 8. Auto-scroll & Draggable Archive
+        const archiveCols = document.querySelectorAll('.archive-column');
+        archiveCols.forEach(col => {
+            const wrapper = col.querySelector('.archive-wrapper');
+            const inner = col.querySelector('.archive-inner');
+            
+            wrapper.appendChild(inner.cloneNode(true));
+            wrapper.appendChild(inner.cloneNode(true));
+
+            let isDown = false;
+            let startY;
+            let targetY = 0;
+            const direction = parseInt(col.getAttribute('data-direction') || '1'); 
+            const speed = 0.5 * direction;
+            let itemHeight = 0;
+
+            col.addEventListener('mousedown', (e) => { isDown = true; col.style.cursor = 'grabbing'; startY = e.pageY - targetY; });
+            col.addEventListener('mouseleave', () => { isDown = false; col.style.cursor = 'grab'; });
+            col.addEventListener('mouseup', () => { isDown = false; col.style.cursor = 'grab'; });
+            col.addEventListener('mousemove', (e) => { if (!isDown) return; e.preventDefault(); targetY = e.pageY - startY; });
+
+            col.addEventListener('touchstart', (e) => { isDown = true; startY = e.touches[0].pageY - targetY; }, { passive: true });
+            col.addEventListener('touchend', () => { isDown = false; });
+            col.addEventListener('touchmove', (e) => { if (!isDown) return; targetY = e.touches[0].pageY - startY; }, { passive: true });
+
+            function playScroll() {
+                itemHeight = inner.offsetHeight;
+                if (!isDown) targetY -= speed; 
+                if (itemHeight > 0) {
+                    while (targetY <= -itemHeight * 2) { targetY += itemHeight; if (isDown) startY -= itemHeight; } 
+                    while (targetY > 0) { targetY -= itemHeight; if (isDown) startY += itemHeight; }
+                }
+                wrapper.style.transform = `translateY(${targetY}px)`;
+                requestAnimationFrame(playScroll);
+            }
+            
+            setTimeout(() => { itemHeight = inner.offsetHeight; targetY = -itemHeight; playScroll(); }, 100); 
+        });
+
+        // 💡 [NEW] 12. TA Control Panel 로직 모음
+        if (modelViewer) {
+            // A. 애니메이션 자동 인식 및 재생 로직
+            modelViewer.addEventListener('load', () => {
+                const animContainer = document.getElementById('anim-container');
+                const animSelect = document.getElementById('anim-select');
+                const animPlayBtn = document.getElementById('anim-play-btn');
+                let isPlaying = false;
+                
+                // 모델에 애니메이션 트랙이 존재한다면 드롭다운 활성화
+                if (modelViewer.availableAnimations && modelViewer.availableAnimations.length > 0) {
+                    animContainer.classList.remove('hidden');
+                    animContainer.classList.add('flex');
+                    animSelect.innerHTML = '<option value="none">🎬 동작: 기본 포즈 (Rest Pose)</option>';
+                    
+                    modelViewer.availableAnimations.forEach((animName) => {
+                        const opt = document.createElement('option');
+                        opt.value = animName;
+                        opt.innerText = `🎬 동작: ${animName}`;
+                        animSelect.appendChild(opt);
+                    });
+                    
+                    // 기본 애니메이션 동작 정지 및 Base Mesh(T-Pose) 셋팅
+                    animSelect.value = 'none';
+                    modelViewer.animationName = 'none';
+                    modelViewer.pause();
+
+                    animSelect.addEventListener('change', (e) => {
+                        if(e.target.value === 'none') {
+                            modelViewer.animationName = 'none';
+                            modelViewer.pause();
+                            modelViewer.currentTime = 0;
+                            isPlaying = false;
+                            
+                            // 재생 버튼 비활성화 처리
+                            if(animPlayBtn) {
+                                animPlayBtn.classList.add('opacity-50', 'pointer-events-none');
+                                animPlayBtn.classList.replace('bg-brand-neon', 'bg-black/80');
+                                animPlayBtn.classList.replace('text-black', 'text-brand-neon');
+                                animPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> 재생';
+                            }
+                        } else {
+                            modelViewer.animationName = e.target.value;
+                            modelViewer.play();
+                            isPlaying = true;
+                            
+                            // 재생 버튼 활성화 및 일시정지 상태로 변경
+                            if(animPlayBtn) {
+                                animPlayBtn.classList.remove('opacity-50', 'pointer-events-none');
+                                animPlayBtn.classList.replace('bg-brand-neon', 'bg-black/80');
+                                animPlayBtn.classList.replace('text-black', 'text-brand-neon');
+                                animPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 일시정지';
+                            }
+                        }
+                    });
+
+                    // 👇 재생/일시정지 버튼 클릭 이벤트
+                    if(animPlayBtn) {
+                        animPlayBtn.addEventListener('click', () => {
+                            if (animSelect.value === 'none') return;
+                            
+                            if (isPlaying) {
+                                modelViewer.pause();
+                                animPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> 재생';
+                                animPlayBtn.classList.replace('bg-black/80', 'bg-brand-neon');
+                                animPlayBtn.classList.replace('text-brand-neon', 'text-black');
+                            } else {
+                                modelViewer.play();
+                                animPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 일시정지';
+                                animPlayBtn.classList.replace('bg-brand-neon', 'bg-black/80');
+                                animPlayBtn.classList.replace('text-black', 'text-brand-neon');
+                            }
+                            isPlaying = !isPlaying;
+                        });
+                    }
+                }
+            });
+
+            // B. 턴테이블 (자동 회전) 토글
+            const rotateBtn = document.getElementById('rotate-btn');
+            if (rotateBtn) {
+                rotateBtn.addEventListener('click', () => {
+                    modelViewer.autoRotate = !modelViewer.autoRotate;
+                    if (modelViewer.autoRotate) {
+                        rotateBtn.classList.replace('bg-black/80', 'bg-brand-neon');
+                        rotateBtn.classList.replace('text-white', 'text-black');
+                        rotateBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> 턴테이블';
+                    } else {
+                        rotateBtn.classList.replace('bg-brand-neon', 'bg-black/80');
+                        rotateBtn.classList.replace('text-black', 'text-white');
+                        rotateBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 정지됨';
+                    }
+                });
+            }
+        }
+
+        // 💡 13. 폴리곤(Triangles) 개수 계산 및 뚫림 방지
+        const polyCountElement = document.getElementById('poly-count');
+        if (modelViewer) {
+            modelViewer.addEventListener('load', () => {
+                let totalTriangles = 0;
+                
+                const symbols = Object.getOwnPropertySymbols(modelViewer);
+                for (const sym of symbols) {
+                    if (sym.description === 'scene' || sym.toString().includes('scene')) {
+                        const scene = modelViewer[sym];
+                        if (scene && typeof scene.traverse === 'function') {
+                            scene.traverse((node) => {
+                                if (node.isMesh && node.geometry && !node.userData.isWireframeOverlay) {
+                                    // 1. 폴리곤 수 카운팅
+                                    if (node.geometry.index) {
+                                        totalTriangles += node.geometry.index.count / 3;
+                                    } else if (node.geometry.attributes.position) {
+                                        totalTriangles += node.geometry.attributes.position.count / 3;
+                                    }
+
+                                    // 2. 🛠️ 매쉬 뚫림(렌더링) 버그 강제 픽스
+                                    if (node.material) {
+                                        node.material.side = 2; // 양면 렌더링 적용 (뒷면이 투명해지는 현상 방지)
+                                        node.material.depthWrite = true; // 투명도 뎁스 버그 방지
+                                        if (node.material.transparent) {
+                                            node.material.alphaTest = 0.5;
+                                        }
+                                        node.material.needsUpdate = true;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                if (polyCountElement) {
+                    if (totalTriangles > 0) {
+                        polyCountElement.innerText = Math.round(totalTriangles).toLocaleString();
+                    } else {
+                        polyCountElement.innerText = "N/A";
+                    }
+                }
+            });
+        }
+
+        // 💡 11. 와이어프레임 토글 기능 (기존)
+        const wireframeBtn = document.getElementById('wireframe-btn');
+        let isWireframe = false;
+
+        if (wireframeBtn && modelViewer) {
+            wireframeBtn.addEventListener('click', () => {
+                isWireframe = !isWireframe;
+                
+                const symbols = Object.getOwnPropertySymbols(modelViewer);
+                for (const sym of symbols) {
+                    if (sym.description === 'scene' || sym.toString().includes('scene')) {
+                        const scene = modelViewer[sym];
+                        if (scene && typeof scene.traverse === 'function') {
+                            scene.traverse((node) => {
+                                if (node.isMesh && !node.userData.isWireframeOverlay) {
+                                    
+                                    let wfClone = node.children.find(c => c.userData.isWireframeOverlay);
+                                    
+                                    if (!wfClone) {
+                                        wfClone = node.clone();
+                                        wfClone.children = []; 
+                                        
+                                        if (node.isSkinnedMesh) {
+                                            wfClone.bind(node.skeleton, node.bindMatrix);
+                                        }
+                                        
+                                        wfClone.material = node.material.clone();
+                                        wfClone.material.wireframe = true;
+                                        wfClone.material.transparent = true;
+                                        wfClone.material.opacity = 0.8; 
+                                        
+                                        wfClone.material.map = null;
+                                        wfClone.material.normalMap = null;
+                                        wfClone.material.roughnessMap = null;
+                                        wfClone.material.metalnessMap = null;
+                                        wfClone.material.emissiveMap = null;
+                                        
+                                        wfClone.material.polygonOffset = true;
+                                        wfClone.material.polygonOffsetFactor = -4;
+                                        wfClone.material.polygonOffsetUnits = -4;
+                                        wfClone.material.depthWrite = false;
+                                        
+                                        if (wfClone.material.color) {
+                                            wfClone.material.color.set('#ffffff'); 
+                                        }
+                                        if (wfClone.material.emissive) {
+                                            wfClone.material.emissive.set('#ffffff');
+                                            wfClone.material.emissiveIntensity = 1.0;
+                                        }
+
+                                        wfClone.userData.isWireframeOverlay = true;
+                                        node.add(wfClone);
+                                    }
+                                    
+                                    wfClone.visible = isWireframe;
+                                }
+                            });
+                        }
+                    }
+                }
+
+                if (isWireframe) {
+                    wireframeBtn.classList.replace('text-brand-neon', 'text-black');
+                    wireframeBtn.classList.replace('bg-black/80', 'bg-brand-neon');
+                    wireframeBtn.innerHTML = '<i class="fa-solid fa-cube"></i> <span class="hidden sm:inline">솔리드 뷰</span>';
+                } else {
+                    wireframeBtn.classList.replace('text-black', 'text-brand-neon');
+                    wireframeBtn.classList.replace('bg-brand-neon', 'bg-black/80');
+                    wireframeBtn.innerHTML = '<i class="fa-solid fa-border-all"></i> <span class="hidden sm:inline">와이어프레임</span>';
+                }
+            });
+        }
+
+        // 9. Contact Click Handler 
+        function handleContactClick(e, contactType, value) {
+            const tempInput = document.createElement("input");
+            tempInput.value = value;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            const textSpan = e.currentTarget.querySelector('.contact-text');
+            const originalText = value;
+            textSpan.innerText = "복사 완료! (Copied)";
+            setTimeout(() => { textSpan.innerText = originalText; }, 2000);
+
+            sendDiscordAlert(contactType);
+        }
+
+        // 10. Discord 알림 봇
+        function sendDiscordAlert(contactType) {
+            const webhookUrl = "https://discord.com/api/webhooks/1490564264258441237/83rv0jgCo6pzRIQHLkvGqi12agU1lbo1CpHFd8x3H2YArHhKQg98mQlp1-SayHY5Nqvo"; 
+            if (webhookUrl === "여기에_디스코드_웹훅_URL을_붙여넣으세요" || !webhookUrl) return;
+
+            const payload = {
+                content: `🚨 **포트폴리오 새 소식!**\n방금 누군가 포트폴리오에서 **[ ${contactType} ]** 링크를 클릭했습니다! (시간: ${new Date().toLocaleString('ko-KR')})`
+            };
+
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(error => console.error("Discord alert failed:", error));
+        }
     </script>
 </body>
 </html>
