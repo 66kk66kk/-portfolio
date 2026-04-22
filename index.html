@@ -221,6 +221,7 @@
                     </button>
                 </div>
 
+                <!-- 👇 min-camera-orbit과 min-field-of-view를 추가하여 훨씬 더 깊게 줌-인 할 수 있도록 설정 -->
                 <model-viewer 
                     src="techwear.glb" 
                     alt="Interactive 3D Character" 
@@ -233,6 +234,8 @@
                     style="--poster-color: transparent;"
                     data-lenis-prevent 
                     oncontextmenu="return false;"
+                    min-camera-orbit="auto auto 0.1m"
+                    min-field-of-view="10deg"
                 >
                 </model-viewer>
 
@@ -834,11 +837,11 @@
                                             wfClone.bind(node.skeleton, node.bindMatrix);
                                         }
                                         
-                                        // 2. 재질(Material) 복제 및 반투명 설정
+                                        // 2. 재질(Material) 복제 및 투명도/가시성 대폭 상향
                                         wfClone.material = node.material.clone();
                                         wfClone.material.wireframe = true;
                                         wfClone.material.transparent = true;
-                                        wfClone.material.opacity = 0.5; // 선명하게 보이도록 불투명도 조절
+                                        wfClone.material.opacity = 0.8; // 매우 선명하게 보이도록 불투명도 0.8 적용
                                         
                                         // 기존 텍스처 이미지 제거 (순수하게 선 색상만 렌더링)
                                         wfClone.material.map = null;
@@ -853,14 +856,14 @@
                                         wfClone.material.polygonOffsetUnits = -4;
                                         wfClone.material.depthWrite = false;
                                         
-                                        // 4. 와이어프레임 색상을 확 튀는 네온 스카이블루(Cyan) 색상으로 변경
+                                        // 4. 와이어프레임을 눈에 확 띄는 순백색(Pure White)으로 변경
                                         if (wfClone.material.color) {
-                                            wfClone.material.color.set('#00e5ff');
+                                            wfClone.material.color.set('#ffffff'); // 흰색 선
                                         }
-                                        // 선 자체가 밝게 빛나도록 설정
+                                        // 선 자체가 엄청나게 밝게 빛나도록 홀로그램 느낌 적용
                                         if (wfClone.material.emissive) {
-                                            wfClone.material.emissive.set('#00e5ff');
-                                            wfClone.material.emissiveIntensity = 0.8;
+                                            wfClone.material.emissive.set('#ffffff');
+                                            wfClone.material.emissiveIntensity = 1.0;
                                         }
 
                                         // 식별자 추가 및 부모 노드에 병합
