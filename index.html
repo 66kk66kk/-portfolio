@@ -221,6 +221,14 @@
                     </button>
                 </div>
 
+                <!-- 👇 폴리곤(Triangles) 카운트를 보여줄 UI 요소 추가 -->
+                <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-20">
+                    <div class="bg-black/80 backdrop-blur-md border border-white/10 text-white text-[9px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg shadow-lg flex flex-col items-end gap-1">
+                        <span class="text-stone-400 uppercase tracking-widest text-[8px] md:text-[10px]">Polygons (Tris)</span>
+                        <span id="poly-count" class="text-brand-neon font-urbanist text-sm md:text-base tracking-wider">Calculating...</span>
+                    </div>
+                </div>
+
                 <!-- 👇 min-camera-orbit과 min-field-of-view를 추가하여 훨씬 더 깊게 줌-인 할 수 있도록 설정 -->
                 <model-viewer 
                     src="techwear.glb" 
@@ -701,6 +709,21 @@
 
         // 💡 3.5 3D 뷰어 이벤트 방지 및 페이지 스크롤 차단
         const modelViewer = document.querySelector('model-viewer');
+        
+        // 🚨 크롬 등 모든 브라우저에서 우클릭 메뉴(컨텍스트 메뉴) 완벽 강제 차단 (Capture 단계)
+        window.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            return false;
+        }, { capture: true });
+
+        // 마우스 다운 시 우클릭 버튼 자체의 기본 동작 방어막 추가
+        window.addEventListener('mousedown', (e) => {
+            if (e.button === 2 || e.button === 3) {
+                e.preventDefault();
+            }
+        }, { capture: true });
+
         if (modelViewer) {
             // 마우스 휠 이벤트 방지
             modelViewer.addEventListener('wheel', (e) => {
@@ -711,11 +734,6 @@
             modelViewer.addEventListener('touchmove', (e) => {
                 e.preventDefault();
             }, { passive: false });
-
-            // 우클릭 방지 (모델 뷰어 내)
-            modelViewer.addEventListener('contextmenu', (e) => {
-                e.preventDefault();
-            });
         }
 
         // 4. Hero Reveal
@@ -803,6 +821,44 @@
             
             setTimeout(() => { itemHeight = inner.offsetHeight; targetY = -itemHeight; playScroll(); }, 100); 
         });
+
+        // 💡 12. 폴리곤(Triangles) 개수 계산 및 표시 기능
+        const polyCountElement = document.getElementById('poly-count');
+        const modelViewerObj = document.querySelector('model-viewer');
+
+        if (modelViewerObj && polyCountElement) {
+            modelViewerObj.addEventListener('load', () => {
+                let totalTriangles = 0;
+                
+                const symbols = Object.getOwnPropertySymbols(modelViewerObj);
+                for (const sym of symbols) {
+                    if (sym.description === 'scene' || sym.toString().includes('scene')) {
+                        const scene = modelViewerObj[sym];
+                        if (scene && typeof scene.traverse === 'function') {
+                            scene.traverse((node) => {
+                                // 메쉬이고, 지오메트리 정보가 있으며, 우리가 추가한 와이어프레임이 아닌 원본만 계산
+                                if (node.isMesh && node.geometry && !node.userData.isWireframeOverlay) {
+                                    if (node.geometry.index) {
+                                        // 인덱스가 있는 지오메트리 (일반적)
+                                        totalTriangles += node.geometry.index.count / 3;
+                                    } else if (node.geometry.attributes.position) {
+                                        // 인덱스가 없는 지오메트리
+                                        totalTriangles += node.geometry.attributes.position.count / 3;
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+                
+                // 숫자에 천 단위 콤마(,) 찍어서 표시
+                if (totalTriangles > 0) {
+                    polyCountElement.innerText = Math.round(totalTriangles).toLocaleString();
+                } else {
+                    polyCountElement.innerText = "N/A";
+                }
+            });
+        }
 
         // 💡 11. 와이어프레임 토글 기능 (내부 Three.js Scene 접근)
         const wireframeBtn = document.getElementById('wireframe-btn');
