@@ -16,6 +16,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
+    <!-- 👇 3D 모델 뷰어를 위한 구글 model-viewer 스크립트 추가 -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"></script>
+
     <script>
         tailwind.config = {
             theme: {
@@ -42,7 +45,7 @@
         body { background-color: #050505; color: #f5f5f5; cursor: default; overflow-x: hidden; }
         ::-webkit-scrollbar { display: none; }
 
-        /* Custom Cursor (디자인 요소로 유지하되 시스템 커서와 병행) */
+        /* Custom Cursor */
         #cursor-dot {
             position: fixed; top: 0; left: 0; width: 8px; height: 8px;
             background-color: #deff9a; border-radius: 50%;
@@ -57,9 +60,7 @@
 
         /* 모바일/터치 디바이스에서는 커스텀 커서 숨김 */
         @media (pointer: coarse) {
-            #cursor-dot, #cursor-outline {
-                display: none !important;
-            }
+            #cursor-dot, #cursor-outline { display: none !important; }
         }
 
         /* Hero Grid Background */
@@ -87,8 +88,7 @@
         .video-wrapper { 
             position: relative; overflow: hidden; border-radius: 20px; 
             border: 1px solid #1a1a1a; background: #0a0a0a;
-            aspect-ratio: 16/9;
-            cursor: pointer;
+            aspect-ratio: 16/9; cursor: pointer;
         }
         .video-wrapper:hover { border-color: #deff9a; }
         
@@ -105,7 +105,7 @@
             text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255,255,255,0.1);
         }
 
-        /* Magnetic Button Effect Area */
+        /* Magnetic Button */
         .magnetic-wrap { display: inline-block; transition: transform 0.3s ease-out; }
 
         /* Text Gradient */
@@ -124,7 +124,6 @@
             -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
         }
 
-        /* 링크 및 버튼에 커서 포인터 적용 */
         a, button, .hover-trigger, .cursor-pointer { cursor: pointer; }
     </style>
 </head>
@@ -138,8 +137,9 @@
     <!-- 1. Navigation -->
     <nav class="fixed top-0 w-full z-40 px-6 py-8 flex justify-between items-center mix-blend-difference">
         <div class="font-urbanist font-black text-2xl tracking-tighter hover-trigger cursor-pointer">KSH<span class="text-brand-neon">.</span></div>
-        <div class="flex gap-8 text-sm font-bold uppercase tracking-widest hidden md:flex">
+        <div class="flex gap-6 text-sm font-bold uppercase tracking-widest hidden md:flex">
             <a href="#showreel" class="hover-trigger transition-opacity hover:opacity-60 text-brand-neon">Showreel</a>
+            <a href="#3d-viewer" class="hover-trigger transition-opacity hover:opacity-60">3D Character</a>
             <a href="#works" class="hover-trigger transition-opacity hover:opacity-60">Works</a>
             <a href="#about" class="hover-trigger transition-opacity hover:opacity-60">Process</a>
             <a href="#contact" class="hover-trigger transition-opacity hover:opacity-60">Contact</a>
@@ -151,7 +151,7 @@
         <div class="grid-bg"></div>
         <div id="hero-glow" class="absolute w-[800px] h-[800px] bg-brand-neon/5 blur-[150px] rounded-full pointer-events-none transition-transform duration-1000 ease-out"></div>
         
-        <div class="w-full max-w-7xl mx-auto flex flex-col items-center text-center">
+        <div class="w-full max-w-7xl mx-auto flex flex-col items-center text-center mt-10">
             <div class="reveal-mask mb-8">
                 <span class="reveal-text text-brand-neon text-xs font-black tracking-[0.3em] uppercase bg-brand-neon/10 py-2 px-6 rounded-full border border-brand-neon/20">
                     Precision in Motion & Space
@@ -170,39 +170,85 @@
                 </p>
             </div>
 
-            <div class="mt-20 gs-fade">
+            <div class="mt-16 gs-fade">
                 <a href="#showreel" class="animate-bounce text-brand-neon text-2xl inline-block hover-trigger">
-                    <i class="fa-solid fa-circle-play"></i>
+                    <i class="fa-solid fa-chevron-down"></i>
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- 3. Main Showreel Section -->
-    <section class="py-12 px-6 relative z-10" id="showreel">
+    <!-- 3. Main Showreel Section (PC & Mobile 반응형) -->
+    <section class="py-20 px-6 relative z-10" id="showreel">
         <div class="max-w-7xl mx-auto gs-fade">
             <div class="text-center mb-8">
-                <span class="text-brand-neon font-black tracking-[0.3em] text-xs uppercase border border-brand-neon/30 px-4 py-2 rounded-full">Technical Artist Showreel</span>
+                <span class="text-brand-neon font-black tracking-[0.2em] md:tracking-[0.3em] text-[10px] md:text-xs uppercase border border-brand-neon/30 px-4 py-2 rounded-full">Technical Artist Showreel</span>
             </div>
-            <!-- 유튜브 영상 KDC5AfLdARI 연결 -->
+            
+            <!-- 유튜브 영상 -->
             <div class="video-card group cursor-pointer" onclick="playVideo(this, 'KDC5AfLdARI')">
-                <div class="video-wrapper w-full aspect-video rounded-[2rem] overflow-hidden shadow-[0_0_50px_rgba(222,255,154,0.08)] border border-brand-neon/30 relative">
-                    <!-- 유튜브 썸네일 이미지 (가장 화질 좋은 maxresdefault 사용) -->
+                <div class="video-wrapper w-full aspect-video rounded-2xl md:rounded-[2rem] overflow-hidden shadow-[0_0_30px_rgba(222,255,154,0.08)] border border-brand-neon/30 relative bg-stone-900">
                     <div class="absolute inset-0 bg-cover bg-center opacity-70 group-hover:opacity-100 transition-opacity duration-700" style="background-image: url('https://img.youtube.com/vi/KDC5AfLdARI/maxresdefault.jpg'), url('https://img.youtube.com/vi/KDC5AfLdARI/hqdefault.jpg');"></div>
-                    <!-- 오버레이 및 플레이 버튼 -->
                     <div class="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-500"></div>
-                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none">
-                        <div class="w-20 h-20 md:w-28 md:h-28 bg-brand-neon text-black rounded-full flex items-center justify-center text-3xl md:text-4xl mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_40px_rgba(222,255,154,0.4)]">
-                            <i class="fa-solid fa-play ml-2"></i>
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center pointer-events-none w-full">
+                        <div class="w-16 h-16 md:w-28 md:h-28 bg-brand-neon text-black rounded-full flex items-center justify-center text-2xl md:text-4xl mb-4 md:mb-6 group-hover:scale-110 transition-transform duration-500 shadow-[0_0_40px_rgba(222,255,154,0.4)]">
+                            <i class="fa-solid fa-play ml-1 md:ml-2"></i>
                         </div>
-                        <h2 class="text-white font-urbanist font-black tracking-[0.3em] text-2xl md:text-4xl drop-shadow-2xl">PLAY SHOWREEL</h2>
+                        <h2 class="text-white font-urbanist font-black tracking-[0.1em] md:tracking-[0.3em] text-xl md:text-4xl drop-shadow-2xl text-center">PLAY SHOWREEL</h2>
                     </div>
                 </div>
+            </div>
+
+            <!-- 핵심 기술 스택 명시 -->
+            <div class="mt-6 md:mt-8 flex flex-wrap justify-center gap-2 md:gap-3">
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-cubes mr-1 md:mr-2 text-brand-neon"></i>Blender</span>
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-video mr-1 md:mr-2 text-brand-neon"></i>Premiere Pro</span>
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-wand-magic-sparkles mr-1 md:mr-2 text-brand-neon"></i>Motion Graphics</span>
             </div>
         </div>
     </section>
 
-    <!-- 4. Philosophy Section -->
+    <!-- 4. Interactive 3D Character (PC & Mobile 반응형) -->
+    <section class="py-20 px-6 relative z-10 bg-brand-card/50" id="3d-viewer">
+        <div class="max-w-7xl mx-auto gs-fade">
+            <div class="text-center mb-8">
+                <span class="text-brand-neon font-black tracking-[0.2em] md:tracking-[0.3em] text-[10px] md:text-xs uppercase border border-brand-neon/30 px-4 py-2 rounded-full">Interactive 3D Character</span>
+            </div>
+            
+            <!-- 3D 뷰어 -->
+            <div class="w-full h-[400px] md:h-[700px] rounded-2xl md:rounded-[2rem] border border-brand-border bg-[#111] relative overflow-hidden shadow-2xl gs-fade cursor-grab active:cursor-grabbing">
+                <model-viewer 
+                    src="techwear.glb" 
+                    alt="Interactive 3D Character" 
+                    auto-rotate 
+                    camera-controls 
+                    shadow-intensity="1" 
+                    exposure="1"
+                    environment-image="neutral"
+                    class="w-full h-full outline-none"
+                    style="--poster-color: transparent;">
+                </model-viewer>
+
+                <!-- 조작 안내 UI (모바일에선 돋보기 숨김 처리로 화면 확보) -->
+                <div class="absolute bottom-4 md:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 md:gap-4 pointer-events-none w-max">
+                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg flex items-center gap-1.5 md:gap-2">
+                        <i class="fa-solid fa-arrows-rotate text-brand-neon"></i> <span class="hidden sm:inline">드래그하여</span> 회전
+                    </div>
+                    <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg items-center gap-1.5 md:gap-2 hidden md:flex">
+                        <i class="fa-solid fa-magnifying-glass text-brand-neon"></i> 스크롤 확대/축소
+                    </div>
+                </div>
+            </div>
+
+            <!-- 핵심 기술 스택 명시 -->
+            <div class="mt-6 md:mt-8 flex flex-wrap justify-center gap-2 md:gap-3">
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-user-astronaut mr-1 md:mr-2 text-brand-neon"></i>3D Modeling</span>
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-vr-cardboard mr-1 md:mr-2 text-brand-neon"></i>Real-time 3D</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Philosophy & Process Section -->
     <section class="py-40 px-6 relative overflow-hidden bg-brand-card" id="about">
         <div class="max-w-5xl mx-auto">
             <div class="grid md:grid-cols-2 gap-20 items-center">
@@ -211,7 +257,7 @@
                         상상을 현실로 만드는<br><span class="text-gradient">테크니컬 워크플로우</span>
                     </h2>
                     
-                    <div class="flex flex-col gap-8 mb-10">
+                    <div class="flex flex-col gap-10 mb-10">
                         <!-- Skill 1 -->
                         <div class="flex gap-5 items-start group">
                             <div class="w-12 h-12 rounded-full border border-brand-border bg-black flex items-center justify-center shrink-0 group-hover:border-brand-neon transition-colors">
@@ -225,21 +271,37 @@
                             </div>
                         </div>
                         
-                        <!-- Skill 2 (Updated Pipeline) -->
+                        <!-- Skill 2 -->
                         <div class="flex gap-5 items-start group">
                             <div class="w-12 h-12 rounded-full border border-brand-border bg-black flex items-center justify-center shrink-0 group-hover:border-brand-neon transition-colors">
                                 <i class="fa-solid fa-vr-cardboard text-brand-neon"></i>
                             </div>
                             <div>
                                 <h3 class="text-white font-bold text-lg mb-2 group-hover:text-brand-neon transition-colors">Virtual Avatar Pipeline</h3>
-                                <p class="text-stone-400 text-sm leading-relaxed mb-2">
+                                <p class="text-stone-400 text-sm leading-relaxed mb-4">
                                     실시간 방송에 바로 투입할 수 있는 최적화된 버추얼 아바타 파이프라인을 구축합니다.
                                 </p>
-                                <ul class="text-stone-500 text-xs font-medium space-y-1 ml-2 border-l-2 border-brand-neon/30 pl-3">
-                                    <li><span class="text-brand-neon">Blender:</span> Auto-Rig Pro를 활용한 정밀한 모델링 및 리깅</li>
-                                    <li><span class="text-brand-neon">Unity:</span> Spring Bone 세팅 및 Toon Shader 최적화</li>
-                                    <li><span class="text-brand-neon">Warudo:</span> 리얼타임 렌더링 및 모션 트래킹 익스포트</li>
-                                </ul>
+                                <!-- 파이프라인 플로우 UI -->
+                                <div class="bg-black/50 border border-white/10 rounded-xl p-4 inline-block">
+                                    <div class="flex flex-col sm:flex-row sm:items-center gap-3 text-xs font-black tracking-wider">
+                                        <div class="flex flex-col">
+                                            <span class="text-white uppercase">Blender</span>
+                                            <span class="text-brand-neon font-medium mt-1">Auto-Rig Pro</span>
+                                        </div>
+                                        <i class="fa-solid fa-arrow-right text-stone-600 hidden sm:block mx-1"></i>
+                                        <i class="fa-solid fa-arrow-down text-stone-600 sm:hidden"></i>
+                                        <div class="flex flex-col">
+                                            <span class="text-white uppercase">Unity 3D</span>
+                                            <span class="text-brand-neon font-medium mt-1">Spring Bone / Toon Shader</span>
+                                        </div>
+                                        <i class="fa-solid fa-arrow-right text-stone-600 hidden sm:block mx-1"></i>
+                                        <i class="fa-solid fa-arrow-down text-stone-600 sm:hidden"></i>
+                                        <div class="flex flex-col">
+                                            <span class="text-white uppercase">Warudo</span>
+                                            <span class="text-brand-neon font-medium mt-1">리얼타임 송출</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -263,15 +325,15 @@
                         <span class="tag">#Simulation</span>
                     </div>
                 </div>
-                <div class="relative gs-fade h-[500px] w-full">
-                    <!-- R&D Archive Animated Wall -->
+                
+                <!-- Continuous R&D Wall (22 Images) -->
+                <div class="relative gs-fade h-[600px] w-full">
                     <div class="absolute inset-0 rounded-3xl border border-brand-border bg-black/40 overflow-hidden flex gap-4 p-4 mask-vertical shadow-2xl shadow-brand-neon/5">
                         
-                        <!-- Column 1 (Auto-scroll UP & Draggable) -->
+                        <!-- Column 1 -->
                         <div class="archive-column flex-1 overflow-hidden cursor-grab select-none" data-direction="1">
                             <div class="archive-wrapper w-full">
                                 <div class="archive-inner flex flex-col gap-4 pb-4">
-                                    <!-- 컬럼 1: 11개 이미지 -->
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
                                             <img src="./trickal-diana.jpg" class="w-full h-full object-cover" alt="Trickal Diana">
@@ -331,58 +393,63 @@
                             </div>
                         </div>
 
-                        <!-- Column 2 (Auto-scroll DOWN & Draggable) -->
+                        <!-- Column 2 -->
                         <div class="archive-column flex-1 overflow-hidden cursor-grab select-none" data-direction="-1">
                             <div class="archive-wrapper w-full">
                                 <div class="archive-inner flex flex-col gap-4 pb-4">
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./dream-tiger.jpg" class="w-full h-full object-cover" alt="드림 타이거 3D 렌더링">
+                                            <img src="./dream-tiger.jpg" class="w-full h-full object-cover" alt="Dream Tiger">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./Halloween.jpg" class="w-full h-full object-cover" alt="할로윈 테마 3D 아트">
+                                            <img src="./Halloween.jpg" class="w-full h-full object-cover" alt="Halloween">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./flower-background.jpg" class="w-full h-full object-cover" alt="꽃 배경 3D 렌더링">
+                                            <img src="./flower-background.jpg" class="w-full h-full object-cover" alt="Flower Background">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./martial-arts.jpg" class="w-full h-full object-cover" alt="무술 캐릭터 애니메이션">
+                                            <img src="./martial-arts.jpg" class="w-full h-full object-cover" alt="Martial Arts">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./monster.jpg" class="w-full h-full object-cover" alt="몬스터 크리처 모델링">
+                                            <img src="./monster.jpg" class="w-full h-full object-cover" alt="Monster">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./Stone-bridge.jpg" class="w-full h-full object-cover" alt="돌다리 환경 모델링">
+                                            <img src="./Stone-bridge.jpg" class="w-full h-full object-cover" alt="Stone Bridge">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./Snow-Fire.jpg" class="w-full h-full object-cover" alt="눈과 불 파티클 시뮬레이션">
+                                            <img src="./Snow-Fire.jpg" class="w-full h-full object-cover" alt="Snow Fire">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./light-whale.jpg" class="w-full h-full object-cover" alt="빛나는 고래 3D 애니메이션">
+                                            <img src="./light-whale.jpg" class="w-full h-full object-cover" alt="Light Whale">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./running.jpg" class="w-full h-full object-cover" alt="달리기 모션 캡쳐 데이터">
+                                            <img src="./running.jpg" class="w-full h-full object-cover" alt="Running">
                                         </div>
                                     </div>
                                     <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
                                         <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
-                                            <img src="./glass-bottle.jpg" class="w-full h-full object-cover" alt="유리병 재질 렌더링">
+                                            <img src="./glass-bottle.jpg" class="w-full h-full object-cover" alt="Glass Bottle">
+                                        </div>
+                                    </div>
+                                    <div class="bg-brand-card border border-white/5 rounded-2xl p-2 hover:border-brand-neon/50 transition-colors pointer-events-none">
+                                        <div class="w-full h-32 bg-stone-900 rounded-xl overflow-hidden relative">
+                                            <img src="./study-room.jpg" class="w-full h-full object-cover" alt="Study Room">
                                         </div>
                                     </div>
                                 </div>
@@ -394,7 +461,7 @@
         </div>
     </section>
 
-    <!-- 4. Featured Works -->
+    <!-- 6. Featured Works -->
     <section class="py-40 px-6 relative" id="works">
         <div class="max-w-7xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
@@ -410,7 +477,6 @@
                 <div class="grid lg:grid-cols-12 gap-12 items-center">
                     <div class="lg:col-span-7 order-2 lg:order-1">
                         <div class="video-wrapper hover-trigger shadow-2xl shadow-brand-neon/5 bg-stone-900" onclick="playVideo(this, 'P8ZCVqonuC0')">
-                            <!-- 유튜브 공식 썸네일 URL 연결 (Fallback 적용) -->
                             <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/P8ZCVqonuC0/maxresdefault.jpg'), url('https://img.youtube.com/vi/P8ZCVqonuC0/hqdefault.jpg');"></div>
                             <div class="play-btn"><i class="fa-solid fa-play ml-1"></i></div>
                             <div class="absolute bottom-6 left-6 flex gap-2">
@@ -475,7 +541,6 @@
                     </div>
                     <div class="lg:col-span-7">
                         <div class="video-wrapper hover-trigger shadow-2xl shadow-teal-400/5 bg-stone-900" onclick="playVideo(this, 'EsTZYuJ5cZ8')">
-                            <!-- 유튜브 공식 썸네일 URL 연결 -->
                             <div class="absolute inset-0 bg-cover bg-center opacity-80 group-hover:opacity-100 transition-opacity duration-500" style="background-image: url('https://img.youtube.com/vi/EsTZYuJ5cZ8/maxresdefault.jpg'), url('https://img.youtube.com/vi/EsTZYuJ5cZ8/hqdefault.jpg');"></div>
                             <div class="play-btn !bg-teal-400"><i class="fa-solid fa-play ml-1"></i></div>
                             <div class="absolute bottom-6 left-6 flex gap-2">
@@ -486,66 +551,15 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Project 03 (New Character Modeling - Layout & Text Updated) -->
-            <div class="group mb-40 gs-fade">
-                <div class="grid grid-cols-1 gap-12">
-                    <!-- Text Section (Full Width) -->
-                    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-6">
-                        <div class="max-w-3xl">
-                            <span class="text-stone-400 font-black text-sm mb-4 block">03 / 3D CHARACTER ASSET</span>
-                            <h3 class="text-4xl font-bold mb-6 group-hover:text-stone-200 transition-colors">오리지널 캐릭터 의상 모델링</h3>
-                            <p class="text-stone-400 text-lg leading-relaxed">
-                                베이스 모델링을 바탕으로 밀리터리 및 테크웨어 스타일의 작업복을 기획하고 제작했습니다. 각 파츠의 재질감을 디테일하게 살린 텍스처링과 블렌더(Blender) 내부 렌더링에 최적화된 쉐이딩 및 토폴로지 구성에 집중했습니다.
-                            </p>
-                        </div>
-                        <div class="flex flex-wrap gap-2 lg:pb-2">
-                            <span class="tag bg-black/50 backdrop-blur-md border-stone-500/30 text-stone-300"><i class="fa-solid fa-user-astronaut mr-1"></i>Character Asset</span>
-                            <span class="tag bg-black/50 backdrop-blur-md border-stone-500/30 text-stone-300"><i class="fa-solid fa-cubes mr-1"></i>Blender 3D</span>
-                            <span class="tag bg-black/50 backdrop-blur-md border-stone-500/30 text-stone-300"><i class="fa-solid fa-shirt mr-1"></i>Marvelous Designer</span>
-                        </div>
-                    </div>
-
-                    <!-- 3분할 턴어라운드 이미지 뷰어 (크기 대폭 확대 및 클릭 이벤트 추가) -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
-                        <div class="rounded-[2rem] overflow-hidden border border-[#1a1a1a] bg-[#0a0a0a] aspect-[4/5] hover:border-[#deff9a] transition-all duration-500 cursor-pointer relative group/img shadow-2xl" onclick="openImageModal('./techwear-front.jpg')">
-                            <img src="./techwear-front.jpg" class="w-full h-full object-cover object-center opacity-80 group-hover/img:opacity-100 group-hover/img:scale-105 transition-all duration-700" alt="작업복 정면">
-                            <div class="absolute bottom-6 left-0 w-full text-center text-[#deff9a] text-[13px] font-black uppercase tracking-[0.2em] opacity-0 group-hover/img:opacity-100 transition-all duration-300 translate-y-2 group-hover/img:translate-y-0 drop-shadow-lg">Front View</div>
-                        </div>
-                        <div class="rounded-[2rem] overflow-hidden border border-[#1a1a1a] bg-[#0a0a0a] aspect-[4/5] hover:border-[#deff9a] transition-all duration-500 cursor-pointer relative group/img shadow-2xl" onclick="openImageModal('./techwear-side.jpg')">
-                            <img src="./techwear-side.jpg" class="w-full h-full object-cover object-center opacity-80 group-hover/img:opacity-100 group-hover/img:scale-105 transition-all duration-700" alt="작업복 측면">
-                            <div class="absolute bottom-6 left-0 w-full text-center text-[#deff9a] text-[13px] font-black uppercase tracking-[0.2em] opacity-0 group-hover/img:opacity-100 transition-all duration-300 translate-y-2 group-hover/img:translate-y-0 drop-shadow-lg">Side View</div>
-                        </div>
-                        <div class="rounded-[2rem] overflow-hidden border border-[#1a1a1a] bg-[#0a0a0a] aspect-[4/5] hover:border-[#deff9a] transition-all duration-500 cursor-pointer relative group/img shadow-2xl" onclick="openImageModal('./techwear-back.jpg')">
-                            <img src="./techwear-back.jpg" class="w-full h-full object-cover object-center opacity-80 group-hover/img:opacity-100 group-hover/img:scale-105 transition-all duration-700" alt="작업복 후면">
-                            <div class="absolute bottom-6 left-0 w-full text-center text-[#deff9a] text-[13px] font-black uppercase tracking-[0.2em] opacity-0 group-hover/img:opacity-100 transition-all duration-300 translate-y-2 group-hover/img:translate-y-0 drop-shadow-lg">Back View</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </section>
 
-    <!-- 6. Physics Simulation R&D -->
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-6 flex gap-2">
-                            <span class="tag bg-black/50 backdrop-blur-md border-stone-500/30 text-stone-300">Character Asset</span>
-                            <span class="tag bg-black/50 backdrop-blur-md">Marvelous Designer</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 5. Physics Simulation R&D -->
+    <!-- 7. Simulation Breakdown & R&D -->
     <section class="py-40 px-6 bg-[#080808]" id="rnd">
         <div class="max-w-7xl mx-auto">
             <div class="mb-20 text-center gs-fade">
-                <h2 class="text-4xl md:text-5xl font-black mb-4">Physics Simulation R&D</h2>
-                <p class="text-stone-500 uppercase tracking-[0.2em] text-xs font-bold">블렌더 물리 엔진 기반의 다이내믹 시뮬레이션 및 모션 그래픽</p>
+                <h2 class="text-4xl md:text-5xl font-black mb-4">Simulation Breakdown & R&D</h2>
+                <p class="text-stone-500 uppercase tracking-[0.2em] text-xs font-bold">물리 시뮬레이션 및 노드 셋업 브레이크다운</p>
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -589,7 +603,7 @@
         </div>
     </section>
 
-    <!-- 6. Footer & Contact -->
+    <!-- 8. Footer & Contact -->
     <footer class="py-40 px-6 relative overflow-hidden" id="contact">
         <div class="max-w-7xl mx-auto text-center">
             <span class="text-brand-neon font-black tracking-widest text-xs uppercase block mb-8 gs-fade">Let's create the future</span>
@@ -599,36 +613,28 @@
             
             <div class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8 gs-fade w-full">
                 <!-- Email Button -->
-                <div class="cursor-pointer magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '이메일', '66kk66kk@naver.com')">
+                <a href="mailto:66kk66kk@naver.com" class="cursor-pointer magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '이메일', '66kk66kk@naver.com')">
                     <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
                         <i class="fa-solid fa-envelope text-brand-neon group-hover:text-black text-xl"></i>
                         <span class="font-black text-lg md:text-xl tracking-wide contact-text transition-colors">66kk66kk@naver.com</span>
                     </div>
-                </div>
+                </a>
                 
                 <!-- Phone Button -->
-                <div class="cursor-pointer magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '전화번호', '010-2240-4984')">
+                <a href="tel:010-2240-4984" class="cursor-pointer magnetic-wrap hover-trigger group" onclick="handleContactClick(event, '전화번호', '010-2240-4984')">
                     <div class="px-8 md:px-12 py-5 md:py-6 rounded-full border border-brand-border bg-brand-card group-hover:bg-brand-neon group-hover:text-black transition-all duration-500 flex items-center justify-center gap-4">
                         <i class="fa-solid fa-phone text-brand-neon group-hover:text-black text-xl"></i>
                         <span class="font-black text-lg md:text-xl tracking-wide contact-text transition-colors">010-2240-4984</span>
                     </div>
-                </div>
+                </a>
             </div>
             
             <div class="mt-40 pt-12 border-t border-brand-border flex flex-col md:flex-row justify-between items-center gap-6 text-stone-600 text-xs font-bold uppercase tracking-widest">
-                <p>© KIM SUNG HO. All Rights Reserved.</p>
+                <p>© 2026 KIM SUNG HO. All Rights Reserved.</p>
                 <p>Designed with Analytical Passion</p>
             </div>
         </div>
     </footer>
-
-    <!-- Image Lightbox Modal (신규 추가) -->
-    <div id="image-modal" class="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
-        <div class="absolute top-6 right-6 md:top-10 md:right-10 text-white text-4xl cursor-pointer hover:text-brand-neon transition-colors z-10" onclick="closeImageModal()">
-            <i class="fa-solid fa-xmark"></i>
-        </div>
-        <img id="modal-image" src="" alt="확대된 이미지" class="max-w-[95vw] max-h-[90vh] object-contain rounded-xl shadow-2xl scale-95 transition-transform duration-300">
-    </div>
 
     <!-- Scripts -->
     <script>
@@ -659,13 +665,11 @@
         const cursorDot = document.getElementById('cursor-dot');
         const cursorOutline = document.getElementById('cursor-outline');
         
-        // 터치 기기 여부 확인 (터치 기기면 커서 애니메이션 실행 안함)
         const isTouchDevice = () => window.matchMedia("(pointer: coarse)").matches;
 
         window.addEventListener('mousemove', (e) => {
             if (isTouchDevice()) return;
             const { clientX, clientY } = e;
-            
             gsap.to(cursorDot, { x: clientX, y: clientY, duration: 0 });
             gsap.to(cursorOutline, { x: clientX, y: clientY, duration: 0.5, ease: 'power3.out' });
         });
@@ -689,9 +693,7 @@
         });
 
         // 4. Hero Reveal
-        gsap.to('.reveal-text', {
-            y: '0%', duration: 1.5, ease: 'expo.out', stagger: 0.1, delay: 0.5
-        });
+        gsap.to('.reveal-text', { y: '0%', duration: 1.5, ease: 'expo.out', stagger: 0.1, delay: 0.5 });
 
         // Background Glow Follow
         window.addEventListener('mousemove', (e) => {
@@ -704,14 +706,7 @@
         gsap.utils.toArray('.gs-fade').forEach(el => {
             gsap.fromTo(el, 
                 { opacity: 0, y: 30 },
-                { 
-                    scrollTrigger: {
-                        trigger: el,
-                        start: "top 90%",
-                        toggleActions: "play none none reverse"
-                    },
-                    opacity: 1, y: 0, duration: 1, ease: 'power3.out'
-                }
+                { scrollTrigger: { trigger: el, start: "top 90%", toggleActions: "play none none reverse" }, opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
             );
         });
 
@@ -735,23 +730,10 @@
         function playVideo(container, source) {
             const wrapper = container.classList.contains('video-wrapper') ? container : container.querySelector('.video-wrapper');
             
-            // source 파일이 .mp4인지 유튜브 ID인지 확인하여 렌더링 분기
             if (source.endsWith('.mp4')) {
-                wrapper.innerHTML = `
-                    <video class="absolute inset-0 w-full h-full object-cover" controls autoplay>
-                        <source src="${source}" type="video/mp4">
-                        브라우저가 동영상을 지원하지 않습니다.
-                    </video>
-                `;
+                wrapper.innerHTML = `<video class="absolute inset-0 w-full h-full object-cover" controls autoplay><source src="${source}" type="video/mp4"></video>`;
             } else {
-                wrapper.innerHTML = `
-                    <iframe 
-                        src="https://www.youtube-nocookie.com/embed/${source}?autoplay=1&mute=0&rel=0&modestbranding=1" 
-                        class="absolute inset-0 w-full h-full border-0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowfullscreen>
-                    </iframe>
-                `;
+                wrapper.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${source}?autoplay=1&mute=0&rel=0&modestbranding=1" class="absolute inset-0 w-full h-full border-0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
             }
             wrapper.onclick = null;
             wrapper.style.cursor = 'default';
@@ -763,7 +745,6 @@
             const wrapper = col.querySelector('.archive-wrapper');
             const inner = col.querySelector('.archive-inner');
             
-            // 3배수로 복제 (위, 중간, 아래 무한루프용 빈공간 방지)
             wrapper.appendChild(inner.cloneNode(true));
             wrapper.appendChild(inner.cloneNode(true));
 
@@ -774,73 +755,31 @@
             const speed = 0.5 * direction;
             let itemHeight = 0;
 
-            // 마우스 드래그 이벤트
-            col.addEventListener('mousedown', (e) => {
-                isDown = true;
-                col.style.cursor = 'grabbing';
-                startY = e.pageY - targetY;
-            });
+            col.addEventListener('mousedown', (e) => { isDown = true; col.style.cursor = 'grabbing'; startY = e.pageY - targetY; });
             col.addEventListener('mouseleave', () => { isDown = false; col.style.cursor = 'grab'; });
             col.addEventListener('mouseup', () => { isDown = false; col.style.cursor = 'grab'; });
-            col.addEventListener('mousemove', (e) => {
-                if (!isDown) return;
-                e.preventDefault();
-                targetY = e.pageY - startY;
-            });
+            col.addEventListener('mousemove', (e) => { if (!isDown) return; e.preventDefault(); targetY = e.pageY - startY; });
 
-            // 모바일 터치(스와이프) 이벤트
-            col.addEventListener('touchstart', (e) => {
-                isDown = true;
-                startY = e.touches[0].pageY - targetY;
-            }, { passive: true }); // passive true 권장
-            
+            col.addEventListener('touchstart', (e) => { isDown = true; startY = e.touches[0].pageY - targetY; }, { passive: true });
             col.addEventListener('touchend', () => { isDown = false; });
-            col.addEventListener('touchmove', (e) => {
-                if (!isDown) return;
-                // e.preventDefault(); 제거: 브라우저 기본 스크롤과 충돌 방지
-                targetY = e.touches[0].pageY - startY;
-            }, { passive: true });
+            col.addEventListener('touchmove', (e) => { if (!isDown) return; targetY = e.touches[0].pageY - startY; }, { passive: true });
 
-            // 자동 스크롤 루프
             function playScroll() {
-                // 아이템 전체 높이 측정
                 itemHeight = inner.offsetHeight;
-
-                if (!isDown) { // 사용자가 드래그 중이 아닐 때만 자체 속도로 이동
-                    targetY -= speed; 
-                }
-                
-                // 수학적 무한 루프 로직 (가운데 요소를 기준으로 끝에 다다르면 즉시 위치 리셋)
+                if (!isDown) targetY -= speed; 
                 if (itemHeight > 0) {
-                    while (targetY <= -itemHeight * 2) {
-                        targetY += itemHeight;
-                        if (isDown) startY -= itemHeight; // 드래그 중 위치가 리셋되어도 마우스 위치가 튀지 않게 보정
-                    } 
-                    while (targetY > 0) {
-                        targetY -= itemHeight;
-                        if (isDown) startY += itemHeight;
-                    }
+                    while (targetY <= -itemHeight * 2) { targetY += itemHeight; if (isDown) startY -= itemHeight; } 
+                    while (targetY > 0) { targetY -= itemHeight; if (isDown) startY += itemHeight; }
                 }
-                
-                // CSS transform을 이용해 브라우저 렌더링 한계 극복 (가장 부드러운 방식)
                 wrapper.style.transform = `translateY(${targetY}px)`;
-                
                 requestAnimationFrame(playScroll);
             }
             
-            // 초기 시작 위치를 정중앙으로 세팅
-            setTimeout(() => {
-                itemHeight = inner.offsetHeight;
-                targetY = -itemHeight;
-                playScroll();
-            }, 100); 
+            setTimeout(() => { itemHeight = inner.offsetHeight; targetY = -itemHeight; playScroll(); }, 100); 
         });
 
-        // 9. Contact Click Handler (클립보드 복사 + 가상 알림)
+        // 9. Contact Click Handler 
         function handleContactClick(e, contactType, value) {
-            e.preventDefault(); // 기본 링크 이동 방지 (안전 장치)
-
-            // 1. 클립보드에 텍스트 복사
             const tempInput = document.createElement("input");
             tempInput.value = value;
             document.body.appendChild(tempInput);
@@ -848,61 +787,29 @@
             document.execCommand("copy");
             document.body.removeChild(tempInput);
 
-            // 2. 버튼 텍스트를 '복사 완료!'로 임시 변경하여 시각적 피드백 제공
             const textSpan = e.currentTarget.querySelector('.contact-text');
             const originalText = value;
-            
             textSpan.innerText = "복사 완료! (Copied)";
-            
-            // 2초 뒤에 원래 텍스트로 복구
-            setTimeout(() => {
-                textSpan.innerText = originalText;
-            }, 2000);
+            setTimeout(() => { textSpan.innerText = originalText; }, 2000);
 
-            // 3. 디스코드 알림 전송 (보안 상 제거됨 - 백엔드 연동 필요)
-            sendDiscordAlertSafe(contactType);
+            sendDiscordAlert(contactType);
         }
 
-        // 10. 안전한 알림 처리 (보안 경고)
-        function sendDiscordAlertSafe(contactType) {
-            /* [보안 경고] 
-               디스코드 웹훅 URL은 절대 프론트엔드 코드(HTML/JS)에 노출하면 안 됩니다.
-               악의적인 사용자가 웹훅 주소를 탈취하여 디스코드 서버에 스팸 공격을 할 수 있습니다.
-               실제 서비스에서는 사용자 클릭 이벤트를 본인의 백엔드 서버(Node.js 등)나
-               AWS Lambda, Vercel Functions 같은 서버리스 함수로 전송하고,
-               서버에서 디스코드 API로 메시지를 전송해야 합니다.
-            */
-            console.warn(`[알림 시스템] '${contactType}' 클릭 이벤트 발생. 실제 서버 연동이 필요합니다.`);
+        // 10. Discord 알림 봇
+        function sendDiscordAlert(contactType) {
+            const webhookUrl = "https://discord.com/api/webhooks/1490564264258441237/83rv0jgCo6pzRIQHLkvGqi12agU1lbo1CpHFd8x3H2YArHhKQg98mQlp1-SayHY5Nqvo"; 
+            if (webhookUrl === "여기에_디스코드_웹훅_URL을_붙여넣으세요" || !webhookUrl) return;
+
+            const payload = {
+                content: `🚨 **포트폴리오 새 소식!**\n방금 누군가 포트폴리오에서 **[ ${contactType} ]** 링크를 클릭했습니다! (시간: ${new Date().toLocaleString('ko-KR')})`
+            };
+
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(error => console.error("Discord alert failed:", error));
         }
-
-        // 11. Image Modal Logic (신규 추가)
-        const imageModal = document.getElementById('image-modal');
-        const modalImage = document.getElementById('modal-image');
-
-        function openImageModal(imageSrc) {
-            if (isTouchDevice()) return; // 터치 기기(모바일) 등에서 원치 않으면 이 줄 유지, 폰에서도 크게 보고 싶다면 이 줄 삭제
-            modalImage.src = imageSrc;
-            imageModal.classList.remove('pointer-events-none');
-            
-            // GSAP를 이용한 부드러운 등장 애니메이션
-            gsap.to(imageModal, { opacity: 1, duration: 0.3, ease: 'power2.out' });
-            gsap.to(modalImage, { scale: 1, duration: 0.4, ease: 'back.out(1.5)' });
-        }
-
-        function closeImageModal() {
-            imageModal.classList.add('pointer-events-none');
-            
-            // GSAP를 이용한 부드러운 퇴장 애니메이션
-            gsap.to(imageModal, { opacity: 0, duration: 0.3, ease: 'power2.in' });
-            gsap.to(modalImage, { scale: 0.95, duration: 0.3, ease: 'power2.in', onComplete: () => { modalImage.src = ''; } });
-        }
-
-        // 모달의 검은 배경 영역 클릭 시 닫기
-        imageModal.addEventListener('click', (e) => {
-            if (e.target === imageModal) {
-                closeImageModal();
-            }
-        });
     </script>
 </body>
 </html>
