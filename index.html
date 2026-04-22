@@ -249,7 +249,7 @@
                     </div>
                 </div>
 
-                <!-- 👇 autoplay 속성 제거됨 -->
+                <!-- 👇 animation-name="none" 속성을 추가하여 첫 번째 애니메이션 강제 적용을 차단 -->
                 <model-viewer 
                     src="techwear.glb" 
                     alt="Interactive 3D Character" 
@@ -264,6 +264,7 @@
                     oncontextmenu="return false;"
                     min-camera-orbit="auto auto 0.1m"
                     min-field-of-view="10deg"
+                    animation-name="none"
                 >
                 </model-viewer>
 
@@ -853,7 +854,7 @@
                 // 모델에 애니메이션 트랙이 존재한다면 드롭다운 활성화
                 if (modelViewer.availableAnimations && modelViewer.availableAnimations.length > 0) {
                     animContainer.classList.remove('hidden');
-                    animSelect.innerHTML = '<option value="none">🎬 동작: 정지 (T-Pose)</option>';
+                    animSelect.innerHTML = '<option value="none">🎬 동작: 기본 포즈 (Rest Pose)</option>';
                     
                     modelViewer.availableAnimations.forEach((animName) => {
                         const opt = document.createElement('option');
@@ -862,14 +863,15 @@
                         animSelect.appendChild(opt);
                     });
                     
-                    // 기본 애니메이션 동작 정지 및 T-Pose 셋팅
+                    // 기본 애니메이션 동작 정지 및 Base Mesh(T-Pose) 셋팅
+                    // model-viewer는 null을 주면 1번 애니메이션을 재생하므로 'none'을 할당합니다.
                     animSelect.value = 'none';
-                    modelViewer.animationName = null;
+                    modelViewer.animationName = 'none';
                     modelViewer.pause();
 
                     animSelect.addEventListener('change', (e) => {
                         if(e.target.value === 'none') {
-                            modelViewer.animationName = null;
+                            modelViewer.animationName = 'none';
                             modelViewer.pause();
                             modelViewer.currentTime = 0;
                         } else {
