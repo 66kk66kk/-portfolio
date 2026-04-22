@@ -213,15 +213,51 @@
                 <span class="text-brand-neon font-black tracking-[0.2em] md:tracking-[0.3em] text-[10px] md:text-xs uppercase border border-brand-neon/30 px-4 py-2 rounded-full">Interactive 3D Character</span>
             </div>
             
-            <div class="w-full h-[400px] md:h-[700px] rounded-2xl md:rounded-[2rem] border border-brand-border bg-[#111] relative overflow-hidden shadow-2xl gs-fade cursor-grab active:cursor-grabbing">
+            <div class="w-full h-[500px] md:h-[750px] rounded-2xl md:rounded-[2rem] border border-brand-border bg-[#111] relative overflow-hidden shadow-2xl gs-fade cursor-grab active:cursor-grabbing">
                 
+                <!-- 💡 [NEW] TA Control Panel (좌측 상단) -->
+                <div class="absolute top-4 left-4 md:top-6 md:left-6 z-30 flex flex-col gap-2 w-[160px] md:w-[200px]">
+                    <div class="text-brand-neon text-[9px] md:text-[10px] font-black uppercase tracking-widest px-1 drop-shadow-md mb-1"><i class="fa-solid fa-sliders mr-1"></i> TA Control Panel</div>
+                    
+                    <!-- Lighting Toggle -->
+                    <div class="relative">
+                        <select id="light-select" class="w-full bg-black/80 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-2 rounded-lg shadow-lg outline-none appearance-none cursor-pointer hover:border-brand-neon/50 transition-colors">
+                            <option value="neutral">💡 조명: Neutral (기본)</option>
+                            <option value="legacy">💡 조명: Studio (스튜디오)</option>
+                            <option value="https://modelviewer.dev/shared-assets/environments/spruit_sunrise_1k_HDR.hdr">💡 조명: Outdoor (야외)</option>
+                            <option value="https://modelviewer.dev/shared-assets/environments/moonless_golf_1k.hdr">💡 조명: Night (야간)</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-white/50 text-[10px] pointer-events-none"></i>
+                    </div>
+
+                    <!-- Animation Toggle (초기엔 숨김, 애니메이션 로드 시 등장) -->
+                    <div class="relative hidden" id="anim-container">
+                        <select id="anim-select" class="w-full bg-black/80 backdrop-blur-md border border-brand-neon/30 text-brand-neon text-[10px] md:text-xs font-bold px-3 py-2 rounded-lg shadow-lg outline-none appearance-none cursor-pointer hover:border-brand-neon/80 transition-colors">
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-brand-neon/50 text-[10px] pointer-events-none"></i>
+                    </div>
+
+                    <div class="flex gap-2 w-full">
+                        <!-- Auto-Rotate (Turntable) -->
+                        <button id="rotate-btn" class="bg-brand-neon text-black text-[10px] md:text-[11px] font-bold px-2 py-2 rounded-lg shadow-lg transition-all flex items-center justify-center gap-1.5 flex-1 hover:bg-white">
+                            <i class="fa-solid fa-rotate"></i> 턴테이블
+                        </button>
+
+                        <!-- Material Render Pass (Clay View) -->
+                        <button id="clay-btn" class="bg-black/80 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-[11px] font-bold px-2 py-2 rounded-lg shadow-lg hover:border-brand-neon/50 transition-all flex items-center justify-center gap-1.5 flex-1">
+                            <i class="fa-solid fa-masks-theater"></i> 클레이
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 기존 우측 상단 기능 (와이어프레임 토글) -->
                 <div class="absolute top-4 right-4 md:top-6 md:right-6 z-20">
-                    <button id="wireframe-btn" class="bg-black/60 backdrop-blur-md border border-brand-neon/50 text-brand-neon text-[10px] md:text-xs font-bold px-3 py-2 md:px-4 md:py-2 rounded-full shadow-lg hover:bg-brand-neon hover:text-black transition-all flex items-center gap-2">
+                    <button id="wireframe-btn" class="bg-black/80 backdrop-blur-md border border-brand-neon/50 text-brand-neon text-[10px] md:text-xs font-bold px-3 py-2 md:px-4 md:py-2 rounded-lg shadow-lg hover:bg-brand-neon hover:text-black transition-all flex items-center gap-2">
                         <i class="fa-solid fa-border-all"></i> <span class="hidden sm:inline">와이어프레임</span>
                     </button>
                 </div>
 
-                <!-- 👇 폴리곤(Triangles) 카운트를 보여줄 UI 요소 추가 -->
+                <!-- 폴리곤(Triangles) 카운트 -->
                 <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 z-20">
                     <div class="bg-black/80 backdrop-blur-md border border-white/10 text-white text-[9px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-lg shadow-lg flex flex-col items-end gap-1">
                         <span class="text-stone-400 uppercase tracking-widest text-[8px] md:text-[10px]">Polygons (Tris)</span>
@@ -229,11 +265,11 @@
                     </div>
                 </div>
 
-                <!-- 👇 min-camera-orbit과 min-field-of-view를 추가하여 훨씬 더 깊게 줌-인 할 수 있도록 설정 -->
                 <model-viewer 
                     src="techwear.glb" 
                     alt="Interactive 3D Character" 
                     auto-rotate 
+                    autoplay
                     camera-controls 
                     shadow-intensity="1" 
                     exposure="1"
@@ -261,8 +297,9 @@
             </div>
 
             <div class="mt-6 md:mt-8 flex flex-wrap justify-center gap-2 md:gap-3">
-                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-user-astronaut mr-1 md:mr-2 text-brand-neon"></i>3D Modeling</span>
-                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-vr-cardboard mr-1 md:mr-2 text-brand-neon"></i>Real-time 3D</span>
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-cubes mr-1 md:mr-2 text-brand-neon"></i>Blender</span>
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-video mr-1 md:mr-2 text-brand-neon"></i>Premiere Pro</span>
+                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-wand-magic-sparkles mr-1 md:mr-2 text-brand-neon"></i>Motion Graphics</span>
             </div>
         </div>
     </section>
@@ -689,7 +726,7 @@
             gsap.to(cursorOutline, { x: clientX, y: clientY, duration: 0.5, ease: 'power3.out' });
         });
 
-        const hoverElements = document.querySelectorAll('.hover-trigger, a, button, .cursor-pointer');
+        const hoverElements = document.querySelectorAll('.hover-trigger, a, button, .cursor-pointer, select');
         hoverElements.forEach(el => {
             el.addEventListener('mouseenter', () => {
                 if (isTouchDevice()) return;
@@ -822,27 +859,142 @@
             setTimeout(() => { itemHeight = inner.offsetHeight; targetY = -itemHeight; playScroll(); }, 100); 
         });
 
-        // 💡 12. 폴리곤(Triangles) 개수 계산 및 표시 기능
-        const polyCountElement = document.getElementById('poly-count');
-        const modelViewerObj = document.querySelector('model-viewer');
+        // 💡 [NEW] 12. TA Control Panel 로직 모음
+        if (modelViewer) {
+            // A. 라이팅 변경 토글
+            const lightSelect = document.getElementById('light-select');
+            if (lightSelect) {
+                lightSelect.addEventListener('change', (e) => {
+                    modelViewer.environmentImage = e.target.value;
+                });
+            }
 
-        if (modelViewerObj && polyCountElement) {
-            modelViewerObj.addEventListener('load', () => {
+            // B. 애니메이션 자동 인식 및 재생 로직
+            modelViewer.addEventListener('load', () => {
+                const animContainer = document.getElementById('anim-container');
+                const animSelect = document.getElementById('anim-select');
+                
+                // 모델에 애니메이션 트랙이 존재한다면 드롭다운 활성화
+                if (modelViewer.availableAnimations && modelViewer.availableAnimations.length > 0) {
+                    animContainer.classList.remove('hidden');
+                    animSelect.innerHTML = '<option value="none">🎬 동작: 정지 (T-Pose)</option>';
+                    
+                    modelViewer.availableAnimations.forEach((animName) => {
+                        const opt = document.createElement('option');
+                        opt.value = animName;
+                        opt.innerText = `🎬 동작: ${animName}`;
+                        animSelect.appendChild(opt);
+                    });
+                    
+                    // 첫 번째 애니메이션 자동 재생 (autoplay 적용 시)
+                    animSelect.value = modelViewer.availableAnimations[0];
+
+                    animSelect.addEventListener('change', (e) => {
+                        if(e.target.value === 'none') {
+                            modelViewer.pause();
+                        } else {
+                            modelViewer.animationName = e.target.value;
+                            modelViewer.play();
+                        }
+                    });
+                }
+            });
+
+            // C. 턴테이블 (자동 회전) 토글
+            const rotateBtn = document.getElementById('rotate-btn');
+            if (rotateBtn) {
+                rotateBtn.addEventListener('click', () => {
+                    modelViewer.autoRotate = !modelViewer.autoRotate;
+                    if (modelViewer.autoRotate) {
+                        rotateBtn.classList.replace('bg-black/80', 'bg-brand-neon');
+                        rotateBtn.classList.replace('text-white', 'text-black');
+                        rotateBtn.innerHTML = '<i class="fa-solid fa-rotate"></i> 턴테이블';
+                    } else {
+                        rotateBtn.classList.replace('bg-brand-neon', 'bg-black/80');
+                        rotateBtn.classList.replace('text-black', 'text-white');
+                        rotateBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 정지됨';
+                    }
+                });
+            }
+
+            // D. 클레이 뷰 (Material 분해도) 토글
+            const clayBtn = document.getElementById('clay-btn');
+            let isClay = false;
+            
+            if (clayBtn) {
+                clayBtn.addEventListener('click', () => {
+                    isClay = !isClay;
+                    
+                    const symbols = Object.getOwnPropertySymbols(modelViewer);
+                    for (const sym of symbols) {
+                        if (sym.description === 'scene' || sym.toString().includes('scene')) {
+                            const scene = modelViewer[sym];
+                            if (scene && typeof scene.traverse === 'function') {
+                                scene.traverse((node) => {
+                                    if (node.isMesh && !node.userData.isWireframeOverlay && node.material) {
+                                        if (isClay) {
+                                            // 기존 텍스처 및 색상 저장
+                                            if (node.userData.originalMap === undefined) {
+                                                node.userData.originalMap = node.material.map;
+                                                node.userData.originalColor = node.material.color ? node.material.color.clone() : null;
+                                                node.userData.originalRoughness = node.material.roughness;
+                                                node.userData.originalMetalness = node.material.metalness;
+                                            }
+                                            
+                                            // 텍스처 제거 및 클레이 재질로 강제 변환
+                                            node.material.map = null;
+                                            node.material.roughness = 0.8;
+                                            node.material.metalness = 0.0;
+                                            if (node.material.color) {
+                                                node.material.color.set('#aaaaaa'); // 부드러운 회색 점토 색상
+                                            }
+                                            node.material.needsUpdate = true;
+                                        } else {
+                                            // 원본 복구
+                                            node.material.map = node.userData.originalMap;
+                                            node.material.roughness = node.userData.originalRoughness !== undefined ? node.userData.originalRoughness : 1;
+                                            node.material.metalness = node.userData.originalMetalness !== undefined ? node.userData.originalMetalness : 0;
+                                            if (node.userData.originalColor && node.material.color) {
+                                                node.material.color.copy(node.userData.originalColor);
+                                            }
+                                            node.material.needsUpdate = true;
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    }
+
+                    // 버튼 스타일 업데이트
+                    if (isClay) {
+                        clayBtn.classList.replace('bg-black/80', 'bg-brand-neon');
+                        clayBtn.classList.replace('text-white', 'text-black');
+                        clayBtn.innerHTML = '<i class="fa-solid fa-palette"></i> 솔리드 복구';
+                    } else {
+                        clayBtn.classList.replace('bg-brand-neon', 'bg-black/80');
+                        clayBtn.classList.replace('text-black', 'text-white');
+                        clayBtn.innerHTML = '<i class="fa-solid fa-masks-theater"></i> 클레이';
+                    }
+                });
+            }
+        }
+
+        // 💡 13. 폴리곤(Triangles) 개수 계산
+        const polyCountElement = document.getElementById('poly-count');
+        if (modelViewer && polyCountElement) {
+            modelViewer.addEventListener('load', () => {
                 let totalTriangles = 0;
                 
-                const symbols = Object.getOwnPropertySymbols(modelViewerObj);
+                const symbols = Object.getOwnPropertySymbols(modelViewer);
                 for (const sym of symbols) {
                     if (sym.description === 'scene' || sym.toString().includes('scene')) {
-                        const scene = modelViewerObj[sym];
+                        const scene = modelViewer[sym];
                         if (scene && typeof scene.traverse === 'function') {
                             scene.traverse((node) => {
-                                // 메쉬이고, 지오메트리 정보가 있으며, 우리가 추가한 와이어프레임이 아닌 원본만 계산
                                 if (node.isMesh && node.geometry && !node.userData.isWireframeOverlay) {
                                     if (node.geometry.index) {
-                                        // 인덱스가 있는 지오메트리 (일반적)
                                         totalTriangles += node.geometry.index.count / 3;
                                     } else if (node.geometry.attributes.position) {
-                                        // 인덱스가 없는 지오메트리
                                         totalTriangles += node.geometry.attributes.position.count / 3;
                                     }
                                 }
@@ -851,7 +1003,6 @@
                     }
                 }
                 
-                // 숫자에 천 단위 콤마(,) 찍어서 표시
                 if (totalTriangles > 0) {
                     polyCountElement.innerText = Math.round(totalTriangles).toLocaleString();
                 } else {
@@ -860,7 +1011,7 @@
             });
         }
 
-        // 💡 11. 와이어프레임 토글 기능 (내부 Three.js Scene 접근)
+        // 💡 11. 와이어프레임 토글 기능 (기존)
         const wireframeBtn = document.getElementById('wireframe-btn');
         let isWireframe = false;
 
@@ -868,66 +1019,52 @@
             wireframeBtn.addEventListener('click', () => {
                 isWireframe = !isWireframe;
                 
-                // model-viewer 내부의 Three.js 심볼(Symbol) 객체를 찾아 Scene에 접근
                 const symbols = Object.getOwnPropertySymbols(modelViewer);
-                
                 for (const sym of symbols) {
                     if (sym.description === 'scene' || sym.toString().includes('scene')) {
                         const scene = modelViewer[sym];
                         if (scene && typeof scene.traverse === 'function') {
                             scene.traverse((node) => {
-                                // 기존 메쉬일 경우에만 작동 (이미 추가한 와이어프레임 메쉬는 제외)
                                 if (node.isMesh && !node.userData.isWireframeOverlay) {
                                     
-                                    // 이 메쉬에 대해 만들어둔 와이어프레임 복제본이 있는지 확인
                                     let wfClone = node.children.find(c => c.userData.isWireframeOverlay);
                                     
                                     if (!wfClone) {
-                                        // 1. 메쉬 형태만 똑같이 복제
                                         wfClone = node.clone();
-                                        wfClone.children = []; // 하위 요소 중복 복제 방지
+                                        wfClone.children = []; 
                                         
-                                        // 🌟 스킨드 메쉬(리깅된 캐릭터) 뼈대 연결 동기화 
-                                        // (분해되거나 찢어지는 현상 방지)
                                         if (node.isSkinnedMesh) {
                                             wfClone.bind(node.skeleton, node.bindMatrix);
                                         }
                                         
-                                        // 2. 재질(Material) 복제 및 투명도/가시성 대폭 상향
                                         wfClone.material = node.material.clone();
                                         wfClone.material.wireframe = true;
                                         wfClone.material.transparent = true;
-                                        wfClone.material.opacity = 0.8; // 매우 선명하게 보이도록 불투명도 0.8 적용
+                                        wfClone.material.opacity = 0.8; 
                                         
-                                        // 기존 텍스처 이미지 제거 (순수하게 선 색상만 렌더링)
                                         wfClone.material.map = null;
                                         wfClone.material.normalMap = null;
                                         wfClone.material.roughnessMap = null;
                                         wfClone.material.metalnessMap = null;
                                         wfClone.material.emissiveMap = null;
                                         
-                                        // 3. 모델과 와이어프레임이 겹쳐서 깜빡거리는 현상(Z-fighting) 방지
                                         wfClone.material.polygonOffset = true;
                                         wfClone.material.polygonOffsetFactor = -4;
                                         wfClone.material.polygonOffsetUnits = -4;
                                         wfClone.material.depthWrite = false;
                                         
-                                        // 4. 와이어프레임을 눈에 확 띄는 순백색(Pure White)으로 변경
                                         if (wfClone.material.color) {
-                                            wfClone.material.color.set('#ffffff'); // 흰색 선
+                                            wfClone.material.color.set('#ffffff'); 
                                         }
-                                        // 선 자체가 엄청나게 밝게 빛나도록 홀로그램 느낌 적용
                                         if (wfClone.material.emissive) {
                                             wfClone.material.emissive.set('#ffffff');
                                             wfClone.material.emissiveIntensity = 1.0;
                                         }
 
-                                        // 식별자 추가 및 부모 노드에 병합
                                         wfClone.userData.isWireframeOverlay = true;
                                         node.add(wfClone);
                                     }
                                     
-                                    // 토글 상태에 따라 껐다 켜기
                                     wfClone.visible = isWireframe;
                                 }
                             });
@@ -935,14 +1072,13 @@
                     }
                 }
 
-                // 버튼 디자인 스위칭 (On/Off 상태)
                 if (isWireframe) {
                     wireframeBtn.classList.replace('text-brand-neon', 'text-black');
-                    wireframeBtn.classList.replace('bg-black/60', 'bg-brand-neon');
+                    wireframeBtn.classList.replace('bg-black/80', 'bg-brand-neon');
                     wireframeBtn.innerHTML = '<i class="fa-solid fa-cube"></i> <span class="hidden sm:inline">솔리드 뷰</span>';
                 } else {
                     wireframeBtn.classList.replace('text-black', 'text-brand-neon');
-                    wireframeBtn.classList.replace('bg-brand-neon', 'bg-black/60');
+                    wireframeBtn.classList.replace('bg-brand-neon', 'bg-black/80');
                     wireframeBtn.innerHTML = '<i class="fa-solid fa-border-all"></i> <span class="hidden sm:inline">와이어프레임</span>';
                 }
             });
