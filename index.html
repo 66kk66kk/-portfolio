@@ -221,9 +221,6 @@
                     </button>
                 </div>
 
-                <!-- 👇 data-lenis-prevent 속성 추가: 휠(줌) 사용 시 페이지 스크롤 강제 차단 -->
-                <!-- 👇 disable-pan 속성 삭제: 우클릭(이동/패닝) 정상 작동 복구 -->
-                <!-- 👇 oncontextmenu="return false;": 모델 뷰어 안에서 우클릭 팝업 메뉴 차단 -->
                 <model-viewer 
                     src="techwear.glb" 
                     alt="Interactive 3D Character" 
@@ -239,7 +236,6 @@
                 >
                 </model-viewer>
 
-                <!-- 조작 안내 UI 직관적 분리 -->
                 <div class="absolute bottom-4 md:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 pointer-events-none w-max">
                     <div class="bg-black/60 backdrop-blur-md border border-white/10 text-white text-[10px] md:text-xs font-bold px-3 py-1.5 md:px-4 md:py-2 rounded-full shadow-lg flex items-center gap-1.5">
                         <i class="fa-solid fa-arrows-rotate text-brand-neon"></i> 좌클릭 회전
@@ -700,6 +696,25 @@
             });
         });
 
+        // 💡 3.5 3D 뷰어 이벤트 방지 및 페이지 스크롤 차단
+        const modelViewer = document.querySelector('model-viewer');
+        if (modelViewer) {
+            // 마우스 휠 이벤트 방지
+            modelViewer.addEventListener('wheel', (e) => {
+                e.preventDefault(); 
+            }, { passive: false }); 
+
+            // 모바일 터치 이벤트 방지
+            modelViewer.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+
+            // 우클릭 방지 (모델 뷰어 내)
+            modelViewer.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+            });
+        }
+
         // 4. Hero Reveal
         gsap.to('.reveal-text', { y: '0%', duration: 1.5, ease: 'expo.out', stagger: 0.1, delay: 0.5 });
 
@@ -788,7 +803,6 @@
 
         // 💡 11. 와이어프레임 토글 기능 (내부 Three.js Scene 접근)
         const wireframeBtn = document.getElementById('wireframe-btn');
-        const modelViewer = document.querySelector('model-viewer');
         let isWireframe = false;
 
         if (wireframeBtn && modelViewer) {
@@ -814,20 +828,39 @@
                                         wfClone = node.clone();
                                         wfClone.children = []; // 하위 요소 중복 복제 방지
                                         
-                                        // 2. 재질(Material) 복제 및 반투명 와이어프레임 덧씌우기
+                                        // 🌟 스킨드 메쉬(리깅된 캐릭터) 뼈대 연결 동기화 
+                                        // (분해되거나 찢어지는 현상 방지)
+                                        if (node.isSkinnedMesh) {
+                                            wfClone.bind(node.skeleton, node.bindMatrix);
+                                        }
+                                        
+                                        // 2. 재질(Material) 복제 및 반투명 설정
                                         wfClone.material = node.material.clone();
                                         wfClone.material.wireframe = true;
                                         wfClone.material.transparent = true;
-                                        wfClone.material.opacity = 0.15; // 반투명도 (0.15 정도가 은은하게 예쁩니다)
+                                        wfClone.material.opacity = 0.5; // 선명하게 보이도록 불투명도 조절
+                                        
+                                        // 기존 텍스처 이미지 제거 (순수하게 선 색상만 렌더링)
+                                        wfClone.material.map = null;
+                                        wfClone.material.normalMap = null;
+                                        wfClone.material.roughnessMap = null;
+                                        wfClone.material.metalnessMap = null;
+                                        wfClone.material.emissiveMap = null;
                                         
                                         // 3. 모델과 와이어프레임이 겹쳐서 깜빡거리는 현상(Z-fighting) 방지
                                         wfClone.material.polygonOffset = true;
-                                        wfClone.material.polygonOffsetFactor = -1;
-                                        wfClone.material.polygonOffsetUnits = -1;
+                                        wfClone.material.polygonOffsetFactor = -4;
+                                        wfClone.material.polygonOffsetUnits = -4;
+                                        wfClone.material.depthWrite = false;
                                         
-                                        // 4. 와이어프레임 색상을 테마색인 네온 그린으로 강제 변경
+                                        // 4. 와이어프레임 색상을 확 튀는 네온 스카이블루(Cyan) 색상으로 변경
                                         if (wfClone.material.color) {
-                                            wfClone.material.color.set('#deff9a');
+                                            wfClone.material.color.set('#00e5ff');
+                                        }
+                                        // 선 자체가 밝게 빛나도록 설정
+                                        if (wfClone.material.emissive) {
+                                            wfClone.material.emissive.set('#00e5ff');
+                                            wfClone.material.emissiveIntensity = 0.8;
                                         }
 
                                         // 식별자 추가 및 부모 노드에 병합
