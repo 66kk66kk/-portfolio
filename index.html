@@ -220,13 +220,20 @@
                     <div class="text-brand-neon text-[9px] md:text-[10px] font-black uppercase tracking-widest px-1 drop-shadow-md mb-1"><i class="fa-solid fa-sliders mr-1"></i> TA Control Panel</div>
                     
                     <!-- Animation Toggle (초기엔 숨김, 애니메이션 로드 시 등장) -->
-                    <div class="relative hidden" id="anim-container">
-                        <select id="anim-select" class="w-full bg-black/80 backdrop-blur-md border border-brand-neon/30 text-brand-neon text-[10px] md:text-xs font-bold px-3 py-2 rounded-lg shadow-lg outline-none appearance-none cursor-pointer hover:border-brand-neon/80 transition-colors">
-                        </select>
-                        <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-brand-neon/50 text-[10px] pointer-events-none"></i>
+                    <div class="hidden flex-col gap-2" id="anim-container">
+                        <div class="relative">
+                            <select id="anim-select" class="w-full bg-black/80 backdrop-blur-md border border-brand-neon/30 text-brand-neon text-[10px] md:text-xs font-bold px-3 py-2 rounded-lg shadow-lg outline-none appearance-none cursor-pointer hover:border-brand-neon/80 transition-colors">
+                            </select>
+                            <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-brand-neon/50 text-[10px] pointer-events-none"></i>
+                        </div>
+                        
+                        <!-- 👇 애니메이션 재생/일시정지 버튼 -->
+                        <button id="anim-play-btn" class="bg-black/80 backdrop-blur-md border border-brand-neon/50 text-brand-neon text-[10px] md:text-[11px] font-bold px-2 py-2 rounded-lg shadow-lg hover:bg-brand-neon hover:text-black transition-all flex items-center justify-center gap-1.5 w-full opacity-50 pointer-events-none">
+                            <i class="fa-solid fa-play"></i> 재생
+                        </button>
                     </div>
 
-                    <div class="flex gap-2 w-full">
+                    <div class="flex gap-2 w-full mt-1">
                         <!-- Auto-Rotate (Turntable) -->
                         <button id="rotate-btn" class="bg-brand-neon text-black text-[10px] md:text-[11px] font-bold px-2 py-2 rounded-lg shadow-lg transition-all flex items-center justify-center gap-1.5 w-full hover:bg-white">
                             <i class="fa-solid fa-rotate"></i> 턴테이블
@@ -249,7 +256,7 @@
                     </div>
                 </div>
 
-                <!-- 👇 animation-name="none" 속성을 추가하여 첫 번째 애니메이션 강제 적용을 차단 -->
+                <!-- 👇 강제 애니메이션 할당을 완벽히 막기 위해 animation-name 속성을 아예 삭제했습니다. -->
                 <model-viewer 
                     src="techwear.glb" 
                     alt="Interactive 3D Character" 
@@ -264,7 +271,6 @@
                     oncontextmenu="return false;"
                     min-camera-orbit="auto auto 0.1m"
                     min-field-of-view="10deg"
-                    animation-name="none"
                 >
                 </model-viewer>
 
@@ -850,10 +856,13 @@
             modelViewer.addEventListener('load', () => {
                 const animContainer = document.getElementById('anim-container');
                 const animSelect = document.getElementById('anim-select');
+                const animPlayBtn = document.getElementById('anim-play-btn');
+                let isPlaying = false;
                 
                 // 모델에 애니메이션 트랙이 존재한다면 드롭다운 활성화
                 if (modelViewer.availableAnimations && modelViewer.availableAnimations.length > 0) {
                     animContainer.classList.remove('hidden');
+                    animContainer.classList.add('flex');
                     animSelect.innerHTML = '<option value="none">🎬 동작: 기본 포즈 (Rest Pose)</option>';
                     
                     modelViewer.availableAnimations.forEach((animName) => {
@@ -863,22 +872,60 @@
                         animSelect.appendChild(opt);
                     });
                     
-                    // 기본 애니메이션 동작 정지 및 Base Mesh(T-Pose) 셋팅
-                    // model-viewer는 null을 주면 1번 애니메이션을 재생하므로 'none'을 할당합니다.
+                    // 👇 기본 애니메이션 동작 정지 및 Base Mesh(T-Pose) 강제 셋팅 (속성 완전 제거)
                     animSelect.value = 'none';
-                    modelViewer.animationName = 'none';
+                    modelViewer.removeAttribute('animation-name');
                     modelViewer.pause();
+                    modelViewer.currentTime = 0;
 
                     animSelect.addEventListener('change', (e) => {
                         if(e.target.value === 'none') {
-                            modelViewer.animationName = 'none';
+                            modelViewer.removeAttribute('animation-name');
                             modelViewer.pause();
                             modelViewer.currentTime = 0;
+                            isPlaying = false;
+                            
+                            // 재생 버튼 비활성화 처리
+                            if(animPlayBtn) {
+                                animPlayBtn.classList.add('opacity-50', 'pointer-events-none');
+                                animPlayBtn.classList.replace('bg-brand-neon', 'bg-black/80');
+                                animPlayBtn.classList.replace('text-black', 'text-brand-neon');
+                                animPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> 재생';
+                            }
                         } else {
                             modelViewer.animationName = e.target.value;
                             modelViewer.play();
+                            isPlaying = true;
+                            
+                            // 재생 버튼 활성화 및 일시정지 상태로 변경
+                            if(animPlayBtn) {
+                                animPlayBtn.classList.remove('opacity-50', 'pointer-events-none');
+                                animPlayBtn.classList.replace('bg-brand-neon', 'bg-black/80');
+                                animPlayBtn.classList.replace('text-black', 'text-brand-neon');
+                                animPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 일시정지';
+                            }
                         }
                     });
+
+                    // 👇 재생/일시정지 버튼 클릭 이벤트
+                    if(animPlayBtn) {
+                        animPlayBtn.addEventListener('click', () => {
+                            if (animSelect.value === 'none') return;
+                            
+                            if (isPlaying) {
+                                modelViewer.pause();
+                                animPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i> 재생';
+                                animPlayBtn.classList.replace('bg-black/80', 'bg-brand-neon');
+                                animPlayBtn.classList.replace('text-brand-neon', 'text-black');
+                            } else {
+                                modelViewer.play();
+                                animPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i> 일시정지';
+                                animPlayBtn.classList.replace('bg-brand-neon', 'bg-black/80');
+                                animPlayBtn.classList.replace('text-black', 'text-brand-neon');
+                            }
+                            isPlaying = !isPlaying;
+                        });
+                    }
                 }
             });
 
