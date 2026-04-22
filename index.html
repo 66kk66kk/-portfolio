@@ -198,22 +198,23 @@
                 </div>
             </div>
 
-            <div class="mt-6 md:mt-8 flex flex-wrap justify-center gap-2 md:gap-3">
-                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-cubes mr-1 md:mr-2 text-brand-neon"></i>Blender</span>
-                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-video mr-1 md:mr-2 text-brand-neon"></i>Premiere Pro</span>
-                <span class="px-4 py-2 md:px-5 md:py-2.5 rounded-full bg-stone-900 border border-white/10 text-stone-300 text-[9px] md:text-[11px] font-bold tracking-widest uppercase shadow-lg"><i class="fa-solid fa-wand-magic-sparkles mr-1 md:mr-2 text-brand-neon"></i>Motion Graphics</span>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. Interactive 3D Character -->
+    <!-- 4. Interactive 3D Character (PC & Mobile 반응형) -->
     <section class="py-20 px-6 relative z-10 bg-brand-card/50" id="3d-viewer">
         <div class="max-w-7xl mx-auto gs-fade">
             <div class="text-center mb-8">
                 <span class="text-brand-neon font-black tracking-[0.2em] md:tracking-[0.3em] text-[10px] md:text-xs uppercase border border-brand-neon/30 px-4 py-2 rounded-full">Interactive 3D Character</span>
             </div>
             
+            <!-- 3D 뷰어 -->
             <div class="w-full h-[400px] md:h-[700px] rounded-2xl md:rounded-[2rem] border border-brand-border bg-[#111] relative overflow-hidden shadow-2xl gs-fade cursor-grab active:cursor-grabbing">
+                
+                <!-- 👇 와이어프레임 토글 버튼 추가 -->
+                <div class="absolute top-4 right-4 md:top-6 md:right-6 z-20">
+                    <button id="wireframe-btn" class="bg-black/60 backdrop-blur-md border border-brand-neon/50 text-brand-neon text-[10px] md:text-xs font-bold px-3 py-2 md:px-4 md:py-2 rounded-full shadow-lg hover:bg-brand-neon hover:text-black transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-border-all"></i> <span class="hidden sm:inline">와이어프레임</span>
+                    </button>
+                </div>
+
                 <model-viewer 
                     src="techwear.glb" 
                     alt="Interactive 3D Character" 
@@ -783,6 +784,45 @@
             
             setTimeout(() => { itemHeight = inner.offsetHeight; targetY = -itemHeight; playScroll(); }, 100); 
         });
+
+        // 💡 11. 와이어프레임 토글 기능 (내부 Three.js Scene 접근)
+        const wireframeBtn = document.getElementById('wireframe-btn');
+        let isWireframe = false;
+
+        if (wireframeBtn && modelViewer) {
+            wireframeBtn.addEventListener('click', () => {
+                isWireframe = !isWireframe;
+                
+                // model-viewer 내부의 Three.js 심볼(Symbol) 객체를 찾아 Scene에 접근하는 해킹 기법
+                const symbols = Object.getOwnPropertySymbols(modelViewer);
+                
+                for (const sym of symbols) {
+                    if (sym.description === 'scene' || sym.toString().includes('scene')) {
+                        const scene = modelViewer[sym];
+                        if (scene && typeof scene.traverse === 'function') {
+                            scene.traverse((node) => {
+                                if (node.isMesh && node.material) {
+                                    // 메쉬의 재질을 와이어프레임으로 강제 변환
+                                    node.material.wireframe = isWireframe;
+                                    node.material.needsUpdate = true;
+                                }
+                            });
+                        }
+                    }
+                }
+
+                // 버튼 디자인 스위칭 (On/Off 상태)
+                if (isWireframe) {
+                    wireframeBtn.classList.replace('text-brand-neon', 'text-black');
+                    wireframeBtn.classList.replace('bg-black/60', 'bg-brand-neon');
+                    wireframeBtn.innerHTML = '<i class="fa-solid fa-cube"></i> <span class="hidden sm:inline">솔리드 뷰</span>';
+                } else {
+                    wireframeBtn.classList.replace('text-black', 'text-brand-neon');
+                    wireframeBtn.classList.replace('bg-brand-neon', 'bg-black/60');
+                    wireframeBtn.innerHTML = '<i class="fa-solid fa-border-all"></i> <span class="hidden sm:inline">와이어프레임</span>';
+                }
+            });
+        }
 
         // 9. Contact Click Handler 
         function handleContactClick(e, contactType, value) {
