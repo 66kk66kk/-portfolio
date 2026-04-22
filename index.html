@@ -256,7 +256,7 @@
                     </div>
                 </div>
 
-                <!-- animation-name="none" 속성을 유지하여 첫 번째 애니메이션 강제 적용을 차단 -->
+                <!-- 👇 강제 애니메이션 할당을 완벽히 막기 위해 animation-name 속성을 아예 삭제했습니다. -->
                 <model-viewer 
                     src="techwear.glb" 
                     alt="Interactive 3D Character" 
@@ -271,7 +271,6 @@
                     oncontextmenu="return false;"
                     min-camera-orbit="auto auto 0.1m"
                     min-field-of-view="10deg"
-                    animation-name="none"
                 >
                 </model-viewer>
 
@@ -873,14 +872,15 @@
                         animSelect.appendChild(opt);
                     });
                     
-                    // 기본 애니메이션 동작 정지 및 Base Mesh(T-Pose) 셋팅
+                    // 👇 기본 애니메이션 동작 정지 및 Base Mesh(T-Pose) 강제 셋팅 (속성 완전 제거)
                     animSelect.value = 'none';
-                    modelViewer.animationName = 'none';
+                    modelViewer.removeAttribute('animation-name');
                     modelViewer.pause();
+                    modelViewer.currentTime = 0;
 
                     animSelect.addEventListener('change', (e) => {
                         if(e.target.value === 'none') {
-                            modelViewer.animationName = 'none';
+                            modelViewer.removeAttribute('animation-name');
                             modelViewer.pause();
                             modelViewer.currentTime = 0;
                             isPlaying = false;
